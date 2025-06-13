@@ -67,12 +67,12 @@ def ahoCorasickMatch(text: str, keywords: list[str]) -> dict:
     return result
 
 
-contohTeks = "ushers measured his shekels"
-daftarKataKunci = ["he", "she", "his", "hers"]
+# contohTeks = "ushers measured his shekels"
+# daftarKataKunci = ["he", "she", "his", "hers"]
 
-hasilPencarian = ahoCorasickMatch(contohTeks, daftarKataKunci)
+# hasilPencarian = ahoCorasickMatch(contohTeks, daftarKataKunci)
 
-print(f"Teks: '{contohTeks}'")
-print("Hasil Pencarian Aho-Corasick:")
-import json
-print(json.dumps(hasilPencarian, indent=2))
+# print(f"Teks: '{contohTeks}'")
+# print("Hasil Pencarian Aho-Corasick:")
+# import json
+# print(json.dumps(hasilPencarian, indent=2))
