@@ -1,7 +1,11 @@
 import flet as ft
 
-
 def homepage(page : ft.Page):
+
+    page.fonts = {
+        "Kanit": "https://raw.githubusercontent.com/google/fonts/master/ofl/kanit/Kanit-Bold.ttf",
+        "Open Sans": "/fonts/OpenSans-Regular.ttf"
+    }
 
     # keyword table container
     keyword_output = ft.Container(
@@ -16,7 +20,7 @@ def homepage(page : ft.Page):
 
     # function to append the keyword
     def add_keyword(e):
-        keyword = keyword_input.content.value.strip()
+        keyword = keyword_input.content.value
         if keyword:
             keyword_output.content.controls.append(  # Append to the GridView!
                 ft.Container(
@@ -50,9 +54,68 @@ def homepage(page : ft.Page):
     left_section = ft.Container(
         content=ft.Column(
             controls= [
-                ft.Text("Home", color="#efe9d9", size=25),
-                ft.Text("Applicants", color="#efe9d9", size=25),
-                ft.Text("Jobs", color="#efe9d9", size=25)
+                    ft.Container(
+                        content = ft.Row(
+                            controls = [
+                                ft.ElevatedButton(
+                                    text="Home",
+                                    color=ft.Colors.GREEN_900,
+                                    style=ft.ButtonStyle(
+                                        text_style=ft.TextStyle(size=20),
+                                        padding=20,  # internal padding (vertical, horizontal)
+                                        bgcolor=ft.Colors.GREEN_100,
+                                        alignment=ft.alignment.top_left
+                                    ),
+                                    expand=True,  # allows button to grow inside expanding parent
+                                ),
+                            ],
+                            expand=True,  # allows container to grow horizontally
+                            spacing=20,
+                        ),
+                        margin=ft.margin.symmetric(horizontal=20, vertical=20),
+                    ),
+                    ft.Container(
+                        content = ft.Row(
+                            controls = [
+                                ft.ElevatedButton(
+                                    text="Jobs",
+                                    color=ft.Colors.GREEN_900,
+                                    style=ft.ButtonStyle(
+                                        text_style=ft.TextStyle(size=20),
+                                        padding=20,  # internal padding (vertical, horizontal)
+                                        bgcolor=ft.Colors.GREEN_100,
+                                        alignment=ft.alignment.top_left
+                                    ),
+                                    expand=True,  # allows button to grow inside expanding parent
+                                    on_click=lambda e: page.go("/jobs")
+                                ),
+                            ],
+                            expand=True,  # allows container to grow horizontally
+                            spacing=20,
+                        ),
+                        margin=ft.margin.symmetric(horizontal=20, vertical=20),
+                    ),
+                    ft.Container(
+                        content = ft.Row(
+                            controls = [
+                                ft.ElevatedButton(
+                                    text="Applicants",
+                                    color=ft.Colors.GREEN_900,
+                                    style=ft.ButtonStyle(
+                                        text_style=ft.TextStyle(size=20),
+                                        padding=20,  # internal padding (vertical, horizontal)
+                                        bgcolor=ft.Colors.GREEN_100,
+                                        alignment=ft.alignment.top_left
+                                    ),
+                                    expand=True,  # allows button to grow inside expanding parent
+                                    on_click=lambda e: page.go("/applicants")
+                                ),
+                            ],
+                            expand=True,  # allows container to grow horizontally
+                            spacing=20,
+                        ),
+                        margin=ft.margin.symmetric(horizontal=20, vertical=20),
+                    )
                 ],
         ),
         bgcolor=ft.Colors.GREEN_900,
@@ -73,14 +136,23 @@ def homepage(page : ft.Page):
                             ft.Text(
                                 "CVRobin", 
                                 color=ft.Colors.GREEN_900,
-                                size=50
+                                size=50,
+                                style=ft.TextStyle(
+                                        weight=ft.FontWeight.W_800,
+                                        font_family="Tahoma"
+                                    )
                                 ),
                         
                             # jargon
                             ft.Text(
                                 "Your reliable HRD substitute", 
                                 color=ft.Colors.GREEN_900,
-                                size =30
+                                size =30,
+                                style=ft.TextStyle(
+                                        weight=ft.FontWeight.W_100,
+                                        italic=True,
+                                        font_family="Consolas"
+                                    )
                                 ),
                         ],
                         alignment=ft.MainAxisAlignment.SPACE_BETWEEN,
@@ -137,7 +209,7 @@ def homepage(page : ft.Page):
                     margin = ft.margin.Margin(left=20, top = 0, right=20, bottom=0),
                 ),
 
-                # CV Count
+                # search button
                 ft.Container(
                     content = ft.Row(
                         controls = [

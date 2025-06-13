@@ -39,10 +39,12 @@ from results.page import results
 def main(page : ft.Page):
     # initialization
     page.title = "CVRobin : CV Analyzer"
+    page.scroll = ft.ScrollMode.AUTO
     page.vertical_alignment = ft.MainAxisAlignment.CENTER
     page.horizontal_alignment = ft.CrossAxisAlignment.CENTER
     page.window.height = 1000
     page.window.width = 1333.3
+    page.expand=True
 
     # route changing
     def route_change(e):

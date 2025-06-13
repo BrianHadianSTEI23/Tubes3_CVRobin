@@ -56,18 +56,18 @@ def results(page : ft.Page):
 
     
     # get all aplicants data from the database
-    conn = mysql.connector.connect(
-        host="localhost",
-        user="root",
-        password="",
-        database="cvrobin"
-    )
+    # conn = mysql.connector.connect(
+    #     host="localhost",
+    #     user="root",
+    #     password="",
+    #     database="cvrobin"
+    # )
 
-    # Create a cursor to execute queries
-    cursor = conn.cursor()
+    # # Create a cursor to execute queries
+    # cursor = conn.cursor()
 
-    # Execute a query
-    cursor.execute("SELECT * FROM application_detail")
+    # # Execute a query
+    # cursor.execute("SELECT * FROM application_detail")
 
     # ################################### THIS WILL BE CHANGED INTO REAL DATA, BUT FOR NOW IS STILL DUMMY DATA ####################################33
     # Fetch and print the results 
@@ -107,8 +107,8 @@ def results(page : ft.Page):
 
 
     # Close the cursor and connection
-    cursor.close()
-    conn.close()
+    # cursor.close()
+    # conn.close()
 
     # left section construct (dark green)
     left_section = ft.Container(

@@ -42,149 +42,329 @@ def applicants(page : ft.Page) :
             "date_of_birth": "2000-07-30",
             "address": "Jl. Setiabudi No. 18, Bandung, West Java, Indonesia",
             "phone_number": "083812341234"
-        }
+        },
+        6: {
+            "first_name": "Budi",
+            "last_name": "Santoso",
+            "date_of_birth": "2000-07-30",
+            "address": "Jl. Setiabudi No. 18, Bandung, West Java, Indonesia",
+            "phone_number": "083812341234"
+        },
+        7: {
+            "first_name": "Budi",
+            "last_name": "Santoso",
+            "date_of_birth": "2000-07-30",
+            "address": "Jl. Setiabudi No. 18, Bandung, West Java, Indonesia",
+            "phone_number": "083812341234"
+        },
+        8: {
+            "first_name": "Budi",
+            "last_name": "Santoso",
+            "date_of_birth": "2000-07-30",
+            "address": "Jl. Setiabudi No. 18, Bandung, West Java, Indonesia",
+            "phone_number": "083812341234"
+        },
+        9: {
+            "first_name": "Budi",
+            "last_name": "Santoso",
+            "date_of_birth": "2000-07-30",
+            "address": "Jl. Setiabudi No. 18, Bandung, West Java, Indonesia",
+            "phone_number": "083812341234"
+        },
+        10: {
+            "first_name": "Budi",
+            "last_name": "Santoso",
+            "date_of_birth": "2000-07-30",
+            "address": "Jl. Setiabudi No. 18, Bandung, West Java, Indonesia",
+            "phone_number": "083812341234"
+        },
+        11: {
+            "first_name": "Budi",
+            "last_name": "Santoso",
+            "date_of_birth": "2000-07-30",
+            "address": "Jl. Setiabudi No. 18, Bandung, West Java, Indonesia",
+            "phone_number": "083812341234"
+        },
     }
 
     
     # get all aplicants data from the database
-    conn = mysql.connector.connect(
-        host="localhost",
-        user="root",
-        password="",
-        database="cvrobin"
-    )
+    # conn = mysql.connector.connect(
+    #     host="localhost",
+    #     user="root",
+    #     password="",
+    #     database="cvrobin"
+    # )
 
-    # Create a cursor to execute queries
-    cursor = conn.cursor()
+    # # Create a cursor to execute queries
+    # cursor = conn.cursor()
 
-    # Execute a query
-    cursor.execute("SELECT * FROM applicant_profile")
+    # # Execute a query
+    # cursor.execute("SELECT * FROM applicant_profile")
 
     # ################################### THIS WILL BE CHANGED INTO REAL DATA, BUT FOR NOW IS STILL DUMMY DATA ####################################33
     # Fetch and print the results 
-    applicant_widgets = []
+    applicant_widgets = ft.Container(
+        content= ft.GridView(
+                max_extent=333 + 10,  # each cell's max width
+                child_aspect_ratio=1.7,  # width/height ratio
+                spacing=15,
+                run_spacing=10,
+                expand=True,
+                auto_scroll=True
+            ),
+        margin=ft.margin.symmetric(horizontal=20),
+        expand=True,
+    )
     for applicant in applicants_data:
-        # wrap every data from database to be displayed on to the ui
-        applicant_widgets.append(
-            ft.Container(
+        widget = ft.Container(
                 content= ft.Column(
                     controls=[
                         # applicant name
-                        ft.Column(
-                            controls=[
-                                ft.Text(
-                                    applicants_data[applicant]["first_name"],
-                                    ),
-                                ft.Text(
-                                    applicants_data[applicant]["last_name"],
-                                    ),
-                            ],
-                            col=2
+                        ft.Container(
+                            content = ft.Column(
+                                controls=[
+                                    ft.Text(
+                                        applicants_data[applicant]["first_name"] + " " + applicants_data[applicant]["last_name"],
+                                        style=ft.TextStyle(
+                                                size=20,
+                                                weight=ft.FontWeight.W_500,
+                                                word_spacing=5,
+                                                color="#efe9d9"
+                                            )
+                                        ),
+                                ],
+                            ),
+                            padding=ft.padding.Padding(left=15, right=15, top=10, bottom=5)
                         ),
 
                         # applicant birthdate, address, phone number
-                        ft.Column(
-                            controls=[
-                                # birthdate
-                                ft.Text(
-                                        f"Birthdate : {applicants_data[applicant]["date_of_birth"]}",
-                                        size= 25,
-                                    ),
+                        ft.Container(
+                            content=ft.Column(
+                                controls=[
+                                    # birthdate
+                                    ft.Text(
+                                            f"Birthdate : {applicants_data[applicant]["date_of_birth"]}",
+                                            style=ft.TextStyle(
+                                                size=15,
+                                                weight=ft.FontWeight.W_400,
+                                                color=ft.Colors.GREEN_900
+                                            )
+                                        ),
 
-                                # address
-                                ft.Text(
-                                        f"Address : {applicants_data[applicant]["address"]}",
-                                        size= 25,
-                                    ),
+                                    # address
+                                    ft.Text(
+                                            f"Address : {applicants_data[applicant]["address"]}",
+                                            style=ft.TextStyle(
+                                                size=15,
+                                                weight=ft.FontWeight.W_400,
+                                                color=ft.Colors.GREEN_900
+                                            )
+                                        ),
 
-                                # phone number
-                                ft.Text(
-                                        f"Phone Number : {applicants_data[applicant]["phone_number"]}",
-                                        size= 25,
-                                    ),
-                            ],
-                            col=2
-                        ),
+                                    # phone number
+                                    ft.Text(
+                                            f"Phone Number : {applicants_data[applicant]["phone_number"]}",
+                                            style=ft.TextStyle(
+                                                size=15,
+                                                weight=ft.FontWeight.W_400,
+                                                color=ft.Colors.GREEN_900
+                                            )
+                                        ),
+                                ],
+                            ),
+                            bgcolor=ft.Colors.GREEN_100,
+                            border_radius=20,
+                            padding=10
+                        )
                     ],
-                    col=2
                 ),
                 expand=True,
-                padding=5
             )
-        )
+        # wrap every data from database to be displayed on to the ui
+        applicant_widgets.content.controls.append(  # Append to the GridView!
+                ft.Container(
+                    content=ft.Row(
+                        controls=[widget],
+                        alignment=ft.MainAxisAlignment.CENTER,
+                    ),
+                    bgcolor=ft.Colors.GREEN_800,
+                    border_radius=20,
+                    expand=True,
+                )
+            )
 
 
     # Close the cursor and connection
-    cursor.close()
-    conn.close()
+    # cursor.close()
+    # conn.close()
 
     # left section construct (dark green)
     left_section = ft.Container(
         content=ft.Column(
             controls= [
-                ft.Text("Home", color="#efe9d9"),
-                ft.Text("Applicants", color="#efe9d9"),
-                ft.Text("Jobs", color="#efe9d9")
+                    ft.Container(
+                        content = ft.Row(
+                            controls = [
+                                ft.ElevatedButton(
+                                    text="Home",
+                                    color=ft.Colors.GREEN_900,
+                                    style=ft.ButtonStyle(
+                                        text_style=ft.TextStyle(size=20),
+                                        padding=20,  # internal padding (vertical, horizontal)
+                                        bgcolor=ft.Colors.GREEN_100,
+                                        alignment=ft.alignment.top_left
+                                    ),
+                                    expand=True,  # allows button to grow inside expanding parent
+                                    on_click=lambda e: page.go("/")
+                                ),
+                            ],
+                            expand=True,  # allows container to grow horizontally
+                            spacing=20,
+                        ),
+                        margin=ft.margin.symmetric(horizontal=20, vertical=20),
+                    ),
+                    ft.Container(
+                        content = ft.Row(
+                            controls = [
+                                ft.ElevatedButton(
+                                    text="Jobs",
+                                    color=ft.Colors.GREEN_900,
+                                    style=ft.ButtonStyle(
+                                        text_style=ft.TextStyle(size=20),
+                                        padding=20,  # internal padding (vertical, horizontal)
+                                        bgcolor=ft.Colors.GREEN_100,
+                                        alignment=ft.alignment.top_left
+                                    ),
+                                    expand=True,  # allows button to grow inside expanding parent
+                                    on_click=lambda e: page.go("/jobs")
+                                ),
+                            ],
+                            expand=True,  # allows container to grow horizontally
+                            spacing=20,
+                        ),
+                        margin=ft.margin.symmetric(horizontal=20, vertical=20),
+                    ),
+                    ft.Container(
+                        content = ft.Row(
+                            controls = [
+                                ft.ElevatedButton(
+                                    text="Applicants",
+                                    color=ft.Colors.GREEN_900,
+                                    style=ft.ButtonStyle(
+                                        text_style=ft.TextStyle(size=20),
+                                        padding=20,  # internal padding (vertical, horizontal)
+                                        bgcolor=ft.Colors.GREEN_100,
+                                        alignment=ft.alignment.top_left
+                                    ),
+                                    expand=True,  # allows button to grow inside expanding parent
+                                    on_click=lambda e: page.go("/applicants")
+                                ),
+                            ],
+                            expand=True,  # allows container to grow horizontally
+                            spacing=20,
+                        ),
+                        margin=ft.margin.symmetric(horizontal=20, vertical=20),
+                    )
                 ],
         ),
         bgcolor=ft.Colors.GREEN_900,
-        padding=20,
+        padding=ft.padding.Padding(left = 30, right = 30, top = 200, bottom=30),
         width=333.3,
     )
 
+    # right bottom section construct (inside right section)
+    right_bottom_section = ft.Container(
+                        content=ft.Column(
+                            controls=[
+                                    applicant_widgets,
+                                ],
+                            horizontal_alignment=ft.CrossAxisAlignment.START,
+                            scroll=ft.ScrollMode.AUTO,
+                    ),
+                    padding=10,
+                    alignment=ft.alignment.center_left,
+                    expand=True,
+                )
 
     # right section construct (cream)
     right_section = ft.Container(
         content=ft.Column(
             [
                 # BANNER + JARGON
-                ft.Row(
-                    [
-                        # title
-                        ft.Text(
-                            "CVRobin", 
-                            color=ft.Colors.GREEN_900,
-                            size=50
-                            ),
-                     
-                        # jargon
-                        ft.Text(
-                            "Your reliable HRD substitute", 
-                            color=ft.Colors.GREEN_900,
-                            size =30
-                            ),
-                    ],
-                    alignment=ft.MainAxisAlignment.SPACE_BETWEEN,
+                ft.Container(
+                    content=ft.Row(
+                        [
+                            # title
+                            ft.Text(
+                                "CVRobin", 
+                                color=ft.Colors.GREEN_900,
+                                size=50,
+                                style=ft.TextStyle(
+                                        weight=ft.FontWeight.W_800,
+                                        font_family="Tahoma"
+                                    )
+                                ),
+                        
+                            # jargon
+                            ft.Text(
+                                "Your reliable HRD substitute", 
+                                color=ft.Colors.GREEN_900,
+                                size =30,
+                                style=ft.TextStyle(
+                                        weight=ft.FontWeight.W_100,
+                                        italic=True,
+                                        font_family="Consolas"
+                                    )
+                                ),
+                        ],
+                        alignment=ft.MainAxisAlignment.SPACE_BETWEEN,
+                    ),
+                    margin=30,
+                    padding=10,
                 ),
 
                 # BANNER SECTION 
-                ft.Text(
-                    "Applicants", 
-                    color=ft.Colors.GREEN_900,
-                    rtl = True,
-                    size=25
+                ft.Container(
+                    content=ft.Text(
+                        "Applicants",
+                        color="#efe9d9",
+                        size=25,
+                        text_align=ft.TextAlign.RIGHT,
                     ),
+                    bgcolor=ft.Colors.GREEN_900,
+                    padding=20,
+                    margin=ft.margin.symmetric(vertical=20),
+                    alignment=ft.alignment.center_right,  # align content inside container
+                    width=800
+                ),
 
-                # applicants
-                *applicant_widgets
-                
-             ],
+                # Applicants
+                right_bottom_section,
+            ],
+            horizontal_alignment=ft.CrossAxisAlignment.END,
+            # scroll=ft.ScrollMode.AUTO,
+            expand=True,
         ),
         bgcolor="#efe9d9",
-        padding=20,
         expand=True,  # Fills half the width
+        height=1000,
     )
 
     return ft.View(
-        route = "/applicants",
+        route="/applicants",
         controls=[
-            ft.Row(
+            ft.Column(  
                 controls=[
-                    # this is placeholder
-                    left_section, 
-                    right_section
+                    ft.Row(
+                        controls=[
+                            left_section,
+                            right_section,
+                        ],
+                        expand=True,
+                    )
                 ],
-                expand=True
+                expand=True ,
             )
-        ]
+        ],
     )
