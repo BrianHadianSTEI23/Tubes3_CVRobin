@@ -1,41 +1,67 @@
 
 # specification : insert, subsitute, remove
 
-class Node:
+class LevenshteinCalculator:
+    "pake pendekatan dp biar ga bruteforce"
 
-    def __init__(self, name : str, toExpand : list["Node"], value : int, alphabet : list[str]) : 
-        self.name = name
-        self.toExpand = toExpand
-        self.value = value
-        self.alphabet = alphabet
+    def __init__(self, s1: str, s2: str):
+        self.s1 = s1
+        self.s2 = s2
+        self.lenS1 = len(s1)
+        self.lenS2 = len(s2)
+        self.dpMatrix = []
+    
+    def calculate(self) -> int:
+        self.dpMatrix = [[0 for _ in range(self.lenS2 + 1)] for _ in range(self.lenS1 + 1)]
 
-    # expand node
-    def levenshteinDistance(self, target : str) :
-        if (self.name == target) :
-            return self.value
-        else :
-            # insert 
-            if len(self.name) < len(target):
-                for letter in self.alphabet:
-                    for i in range(len(self.name)):
-                        newName : str = self.name[:i] + letter + self.name[i:]
-                        newValue : int = self.value + 1
-                        self.toExpand.append(Node(newName, [], newValue, self.alphabet))
-            # delete
-            if len(self.name) > 0:
-                for i in range(len(self.name)):
-                    newName : str = self.name[:i - 1] + self.name[i:]
-                    newValue : int = self.value + 1
-                    self.toExpand.append(Node(newName, [], newValue, self.alphabet))
-            # substitute
-            for letter in self.alphabet:
-                if letter in self.name:
-                    for i in range(len(self.name)):
-                        if (letter != self.name[i]) :
-                            newName : str = self.name[:i - 1] + letter + self.name[i:]
-                            newValue : int = self.value + 1
-                            self.toExpand.append(Node(newName, [], newValue, self.alphabet))
+        "isi cost"
+        for j in range(self.lenS2 + 1):
+            self.dpMatrix[0][j] = j
 
-            # expand all
-            for node in self.toExpand:
-                node.levenshteinDistance(target)
+        for i in range(self.lenS1 + 1):
+            self.dpMatrix[i][0] = i
+
+        for i in range(1, self.lenS1 + 1):
+            for j in range(1, self.lenS2 + 1):
+                substitutionCost = 0
+                if self.s1[i-1] == self.s2[j-1]:
+                    substitutionCost = 0
+                else:
+                    substitutionCost = 1
+                self.dpMatrix[i][j] = min(
+                    self.dpMatrix[i-1][j] + 1,
+                    self.dpMatrix[i][j-1] + 1,
+                    self.dpMatrix[i-1][j-1] + substitutionCost
+                )
+
+        self.printMatrix()
+        return self.dpMatrix[self.lenS1][self.lenS2]
+
+    def printMatrix(self):
+        print("Matrix LevenShtein: ")
+        for row in self.dpMatrix:
+            print(row)
+
+
+
+def fuzzyMatch(keyword: str, text: str, threshold: int) -> list[str]:
+    print(f"Mencari '{keyword}' di dalam teks dengan threshold <= {threshold}...")
+    wordsInText = text.lower().split()
+    #list buat nyimpen kata yg mungkin cocok
+    foundMatches = []
+    
+    for word in wordsInText:
+        calculator = LevenshteinCalculator(keyword.lower(), word)
+        distance = calculator.calculate()
+        if distance <= threshold:
+            print(f"  -> Ditemukan kecocokan: '{word}' (jarak: {distance})")
+            foundMatches.append(word)
+            
+    return foundMatches
+
+contoh_teks_cv = "My main skill is programming with javva and pythin."
+kata_kunci = "java"
+ambang_batas = 2
+
+kecocokan = fuzzyMatch(kata_kunci, contoh_teks_cv, ambang_batas)
+print(f"\nHasil akhir kata yang cocok: {kecocokan}")
