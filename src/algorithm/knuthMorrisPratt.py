@@ -48,3 +48,7 @@ def knuthMorrisPrattMatch(text : str, keywords : list[str]) -> dict[str, int]:
                 iterForSuffix += 1
  
     return result
+
+# debug
+if __name__ == "__main__":
+    print(knuthMorrisPrattMatch("hayo apa hayo", ["ao"]))

@@ -3,58 +3,70 @@ import flet as ft
 import mysql.connector
 from summary.page import summary
 from viewCV.page import viewCV
+from algorithm.encryptionModule import decrypt
+from algorithm.ahoCorasick import ahoCorasickMatch
+from algorithm.boyerMoore import boyerMooreMatch
+from algorithm.knuthMorrisPratt import knuthMorrisPrattMatch
+from algorithm.levenshteinDistance import fuzzyMatch
+from time import time
+from algorithm.preprocessCV import CV
 
 def results(page : ft.Page, keyword_list : list[str], cv_count_to_search : int, search_algorithm_to_search : str):
 
+    # global variables
+    found_count = 0
+    threshold = 2
+    password = "abrarbrianfaqih"
+
     # dummy data
-    results_data = {
-        1: {
-            "first_name": "Rudy",
-            "last_name": "Boul",
-            "date_of_birth": "1234-09-12",
-            "address": "Ganesha St No. 39, Bandung, West Java, Indonesia",
-            "phone_number": "0291831842",
-            "match_keywords" : [
-                {
-                    "Java" : 2,
-                    "Python" : 1,
-                    "Programming" : 2,
-                }
-            ],
-            "cv_path" : "cv_rudy_boul",
-            "applicant_id" : 1
-        },
-        2: {
-            "first_name": "Dina",
-            "last_name": "Hartono",
-            "date_of_birth": "1996-02-24",
-            "address": "Jl. Asia Afrika No. 12, Bandung, West Java, Indonesia",
-            "phone_number": "081234567890",
-            "match_keywords" : [
-                {
-                    "Programming" : 2,
-                    "Python" : 1,
-                }
-            ],
-            "cv_path": "cv_dina_hartono",
-            "applicant_id" : 2
-        },
-        3: {
-            "first_name": "Andi",
-            "last_name": "Wijaya",
-            "date_of_birth": "1988-11-15",
-            "address": "Jl. Braga No. 3, Bandung, West Java, Indonesia",
-            "phone_number": "082112345678",
-            "match_keywords" : [
-                {
-                    "Java" : 2,
-                    "Python" : 1,
-                }
-            ],
-            "cv_path" : "cv_andi_wijaya",
-            "applicant_id" : 3
-        },
-    }
+    # results_data = {
+    #     1: {
+    #         "first_name": "Rudy",
+    #         "last_name": "Boul",
+    #         "date_of_birth": "1234-09-12",
+    #         "address": "Ganesha St No. 39, Bandung, West Java, Indonesia",
+    #         "phone_number": "0291831842",
+    #         "match_keywords" : [
+    #             {
+    #                 "Java" : 2,
+    #                 "Python" : 1,
+    #                 "Programming" : 2,
+    #             }
+    #         ],
+    #         "cv_path" : "cv_rudy_boul",
+    #         "applicant_id" : 1
+    #     },
+    #     2: {
+    #         "first_name": "Dina",
+    #         "last_name": "Hartono",
+    #         "date_of_birth": "1996-02-24",
+    #         "address": "Jl. Asia Afrika No. 12, Bandung, West Java, Indonesia",
+    #         "phone_number": "081234567890",
+    #         "match_keywords" : [
+    #             {
+    #                 "Programming" : 2,
+    #                 "Python" : 1,
+    #             }
+    #         ],
+    #         "cv_path": "cv_dina_hartono",
+    #         "applicant_id" : 2
+    #     },
+    #     3: {
+    #         "first_name": "Andi",
+    #         "last_name": "Wijaya",
+    #         "date_of_birth": "1988-11-15",
+    #         "address": "Jl. Braga No. 3, Bandung, West Java, Indonesia",
+    #         "phone_number": "082112345678",
+    #         "match_keywords" : [
+    #             {
+    #                 "Java" : 2,
+    #                 "Python" : 1,
+    #             }
+    #         ],
+    #         "cv_path" : "cv_andi_wijaya",
+    #         "applicant_id" : 3
+    #     },
+    # }
 
     def go_to_summary(e, id_applicant : int):
         page.views.clear()
@@ -65,21 +77,118 @@ def results(page : ft.Page, keyword_list : list[str], cv_count_to_search : int, 
         page.views.clear()
         page.views.append(viewCV(page, id_applicant))
         page.update()
-    
+
     # get all aplicants data from the database
-    # conn = mysql.connector.connect(
-    #     host="mysql-66af4eb-cvrobin.g.aivencloud.com",
-    #     user="avnadmin",
-    #     password="AVNS_OwS64toTSD7MkC29m2-",
-    #     database="defaultdb",
-    #     port = 10647
-    # )
+    conn = mysql.connector.connect(
+        host="mysql-66af4eb-cvrobin.g.aivencloud.com",
+        user="avnadmin",
+        password="AVNS_OwS64toTSD7MkC29m2-",
+        database="defaultdb",
+        port = 10647
+    )
 
-    # # Create a cursor to execute queries
-    # cursor = conn.cursor()
+    # Create a cursor to execute queries
+    cursor = conn.cursor()
 
-    # # # Execute a query
-    # cursor.execute("SELECT * FROM application_detail")
+    # # Execute a query
+    cursor.execute("SELECT * FROM applicant_profile NATURAL JOIN application_detail")
+
+    # debug
+    # cursor.fetchall = (applicant_id, first_name, last_name, dob, address, phone, detail_id, application_role, cv_path)
+    start_time = time()
+    results_data = {}
+    for el in cursor.fetchall():
+        if (found_count < cv_count_to_search):
+
+            # debug
+            # print(f"applicant id : {el[0]}")
+            # print(f"first name : {decrypt(password, el[1])}")
+            # print(f"last_name : {decrypt(password, el[2])}")
+            # print(f"date of birth : {decrypt(password, el[3])}")
+            # print(f"address : {decrypt(password, el[4])}")
+            # print(f"phone number : {decrypt(password, el[5])}")
+            # print(f"detail id : {el[6]}")
+            # print(f"application role: {decrypt(password, el[7])}")
+            # print(f"cv path : {decrypt(password, el[8])}")
+            # print("-" * 40)
+
+            # update needed data
+            applicant_id_data = {}
+            applicant_id_data.update({"applicant_id" : el[0]})
+            applicant_id_data.update({"first_name" : decrypt(password, el[1])})
+            applicant_id_data.update({"last_name" : decrypt(password, el[2])})
+            applicant_id_data.update({"date_of_birth" :  decrypt(password, el[3])})
+            applicant_id_data.update({"address" :  decrypt(password, el[4])})
+            applicant_id_data.update({"phone_number" :  decrypt(password, el[5])})
+            applicant_id_data.update({"detail_id": el[6]})
+            applicant_id_data.update({"application_role" :  decrypt(password, el[7])})
+            applicant_id_data.update({"cv_path" :  decrypt(password, el[8])})
+
+            # read the cv path
+            keyword_match_data = {}
+            cv_data = CV(decrypt(password, el[8]))
+            if (search_algorithm_to_search == "Boyer-Moore"):
+                # scan using boyer moore
+                keyword_match_data = boyerMooreMatch(cv_data.continuousText, keyword_list)
+                for keyword in keyword_list: # there are no keyword match -> fuzzy matching
+                    if keyword not in keyword_match_data:
+                        fuzzy_result = fuzzyMatch(list(keyword), cv_data.continuousText, threshold)
+                        if fuzzy_result:
+                            keyword_match_data.update({keyword : fuzzyMatch(list(keyword), cv_data.continuousText, threshold)})
+
+                # check if all the keyword exist and if yes, add the found count
+                all_exist = True
+                for keyword in keyword_list:
+                    if keyword not in keyword_match_data:
+                        all_exist = False
+                
+                if all_exist : 
+                    applicant_id_data.update({"match_keywords" : keyword_match_data})
+                    found_count += 1
+                    
+            elif (search_algorithm_to_search == "Knuth-Morris-Pratt"):
+                # scan using kmp
+                keyword_match_data = knuthMorrisPrattMatch(cv_data.continuousText, keyword_list)
+                for keyword in keyword_list: # there are no keyword match -> fuzzy matching
+                    if keyword not in keyword_match_data:
+                        fuzzy_result = fuzzyMatch(list(keyword), cv_data.continuousText, threshold)
+                        if fuzzy_result:
+                            keyword_match_data.update({keyword : fuzzyMatch(list(keyword), cv_data.continuousText, threshold)})
+
+                # check if all the keyword exist and if yes, add the found count
+                all_exist = True
+                for keyword in keyword_list:
+                    if keyword not in keyword_match_data:
+                        all_exist = False
+                
+                if all_exist : 
+                    applicant_id_data.update({"match_keywords" : keyword_match_data})
+                    found_count += 1
+            elif (search_algorithm_to_search == "Aho-Corasick"):
+                # scan using ah
+                keyword_match_data = ahoCorasickMatch(cv_data.continuousText, keyword_list)
+                for keyword in keyword_list: # there are no keyword match -> fuzzy matching
+                    if keyword not in keyword_match_data:
+                        fuzzy_result = fuzzyMatch(list(keyword), cv_data.continuousText, threshold)
+                        if fuzzy_result:
+                            keyword_match_data.update({keyword : fuzzyMatch(list(keyword), cv_data.continuousText, threshold)})
+
+                # check if all the keyword exist and if yes, add the found count
+                all_exist = True
+                for keyword in keyword_list:
+                    if keyword not in keyword_match_data:
+                        all_exist = False
+                
+                if all_exist : 
+                    applicant_id_data.update({"match_keywords" : keyword_match_data})
+                    found_count += 1
+            results_data.update({el[0] : applicant_id_data})
+
+    # count time
+    end_time = time()
+    process_time = end_time - start_time
+
+
 
     # ################################### THIS WILL BE CHANGED INTO REAL DATA, BUT FOR NOW IS STILL DUMMY DATA ####################################33
     # Fetch and print the results 
@@ -316,7 +425,7 @@ def results(page : ft.Page, keyword_list : list[str], cv_count_to_search : int, 
                 # BANNER SECTION 
                 ft.Container(
                     content=ft.Text(
-                        "Results",
+                        "Results (" + str(process_time) + ") ms",
                         color="#efe9d9",
                         size=25,
                         text_align=ft.TextAlign.RIGHT,

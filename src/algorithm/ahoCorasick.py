@@ -1,3 +1,5 @@
+import json
+
 def buildAhoCorasickMachine(keywords: list[str]) -> list:
     machine = [{'children': {}, 'output': [], 'fail': 0}]
     
@@ -61,18 +63,17 @@ def ahoCorasickMatch(text: str, keywords: list[str]) -> dict:
         if machine[nodeIndex]['output']:
             for keyword in machine[nodeIndex]['output']:
                 if keyword not in result:
-                    result[keyword] = []
-                result[keyword].append(i)
+                    result[keyword] = 0
+                result[keyword] += 1
                 
     return result
 
 
-# contohTeks = "ushers measured his shekels"
+# contohTeks = "usher measured his shekels"
 # daftarKataKunci = ["he", "she", "his", "hers"]
 
 # hasilPencarian = ahoCorasickMatch(contohTeks, daftarKataKunci)
 
 # print(f"Teks: '{contohTeks}'")
 # print("Hasil Pencarian Aho-Corasick:")
-# import json
 # print(json.dumps(hasilPencarian, indent=2))

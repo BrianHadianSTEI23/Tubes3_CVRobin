@@ -3,6 +3,8 @@
 
 import os
 
+salt : str = '4c8606f5a10e3895f2e7b929fa331fa1'
+
 # --- Bagian 1: Kelas Lfsr ---
 class Lfsr:
     def __init__(self, seed, taps, stateSize):
@@ -80,9 +82,8 @@ def generateKeyFromPassword(password: str, salt: bytes, length: int) -> bytes:
     return key[:length]
 
 # --- Bagian 4: Fungsi Encrypt ---
-def encrypt(password: str, plaintext: str) -> dict:
-    salt = os.urandom(16)
-    keyMaterial = generateKeyFromPassword(password, salt, 48)
+def encrypt(password: str, plaintext: str) -> str:
+    keyMaterial = generateKeyFromPassword(password, bytes.fromhex(salt), 48)
     lfsrSeedBytes = keyMaterial[:16]
     hmacKey = keyMaterial[16:]
 
@@ -103,23 +104,22 @@ def encrypt(password: str, plaintext: str) -> dict:
     
     hmac = CustomHmac(key=hmacKey)
     tag = hmac.sign(ciphertext)
+
+    res = ciphertext.hex() + tag.hex()
     
-    return {
-        "ciphertext": ciphertext.hex(),
-        "salt": salt.hex(),
-        "tag": tag.hex()
-    }
+    return res
+        
 
 # --- Bagian 5: Fungsi Decrypt ---
-def decrypt(password: str, encryptedData: dict) -> str:
+def decrypt(password: str, encryptedData: str) -> str:
     try:
-        ciphertext = bytes.fromhex(encryptedData["ciphertext"])
-        salt = bytes.fromhex(encryptedData["salt"])
-        receivedTag = bytes.fromhex(encryptedData["tag"])
+        ciphertext = bytes.fromhex(encryptedData[:-16])
+        receivedTag = bytes.fromhex(encryptedData[-16:])
+        # salt = bytes.fromhex(encryptedData["salt"])
     except (ValueError, KeyError):
         raise ValueError("Paket terenkripsi tidak valid atau korup.")
 
-    keyMaterial = generateKeyFromPassword(password, salt, 48)
+    keyMaterial = generateKeyFromPassword(password, bytes.fromhex(salt), 48)
     lfsrSeedBytes = keyMaterial[:16]
     hmacKey = keyMaterial[16:]
 
@@ -143,48 +143,48 @@ def decrypt(password: str, encryptedData: dict) -> str:
 
     return bytes(decryptedBytes).decode('utf-8')
 
-# if __name__ == "__main__":
-#     # Skenario 1: Enkripsi dan Dekripsi Berhasil
-#     print("--- Skenario 1: Sukses ---")
-#     userPassword = "PasswordSuperRahasia123"
-#     originalData = "Farhan, CTO, 081234567890, Jalan Ganesha 10"
+if __name__ == "__main__":
+    # Skenario 1: Enkripsi dan Dekripsi Berhasil
+    print("--- Skenario 1: Sukses ---")
+    userPassword = "PasswordSuperRahasia123"
+    originalData = "Farhan, CTO, 081234567890, Jalan Ganesha 10"
     
-#     print(f"Data Asli: {originalData}")
+    print(f"Data Asli: {originalData}")
     
-#     encryptedPackage = encrypt(userPassword, originalData)
-#     print(f"Paket Terenkripsi: {encryptedPackage}")
+    encryptedPackage = encrypt(userPassword, originalData)
+    print(f"Paket Terenkripsi: {encryptedPackage}")
     
-#     try:
-#         decryptedData = decrypt(userPassword, encryptedPackage)
-#         print(f"Data Terdekripsi: {decryptedData}")
-#         assert originalData == decryptedData
-#         print("✅ Integritas dan kerahasiaan terjaga!")
-#     except ValueError as e:
-#         print(f"❌ Terjadi Error Tak Terduga: {e}")
+    try:
+        decryptedData = decrypt(userPassword, encryptedPackage)
+        print(f"Data Terdekripsi: {decryptedData}")
+        assert originalData == decryptedData
+        print("✅ Integritas dan kerahasiaan terjaga!")
+    except ValueError as e:
+        print(f"❌ Terjadi Error Tak Terduga: {e}")
 
-#     print("\n" + "="*40 + "\n")
+    print("\n" + "="*40 + "\n")
 
-#     # Skenario 2: Gagal Dekripsi karena Password Salah
-#     print("--- Skenario 2: Password Salah ---")
-#     try:
-#         print("Mencoba dekripsi dengan password yang salah...")
-#         decryptedData = decrypt("PasswordSalah", encryptedPackage)
-#     except ValueError as e:
-#         print(f"✅ Berhasil! Error yang diharapkan muncul: {e}")
+    # Skenario 2: Gagal Dekripsi karena Password Salah
+    print("--- Skenario 2: Password Salah ---")
+    try:
+        print("Mencoba dekripsi dengan password yang salah...")
+        decryptedData = decrypt("PasswordSalah", encryptedPackage)
+    except ValueError as e:
+        print(f"✅ Berhasil! Error yang diharapkan muncul: {e}")
 
-#     print("\n" + "="*40 + "\n")
+    print("\n" + "="*40 + "\n")
 
-#     # Skenario 3: Gagal Dekripsi karena Data Dirusak (Tampering)
-#     print("--- Skenario 3: Data Dirusak ---")
-#     tamperedCiphertext = bytearray.fromhex(encryptedPackage['ciphertext'])
-#     # Ubah satu bit saja di tengah ciphertext
-#     originalByte = tamperedCiphertext[5]
-#     tamperedByte = originalByte ^ 1 
-#     tamperedCiphertext[5] = tamperedByte
-#     encryptedPackage['ciphertext'] = tamperedCiphertext.hex()
+    # Skenario 3: Gagal Dekripsi karena Data Dirusak (Tampering)
+    print("--- Skenario 3: Data Dirusak ---")
+    tamperedCiphertext = bytearray.fromhex(encryptedPackage)
+    # Ubah satu bit saja di tengah ciphertext
+    originalByte = tamperedCiphertext[5]
+    tamperedByte = originalByte ^ 1 
+    tamperedCiphertext[5] = tamperedByte
+    encryptedPackage = tamperedCiphertext.hex()
     
-#     print("Ciphertext telah diubah. Mencoba dekripsi...")
-#     try:
-#         decryptedData = decrypt(userPassword, encryptedPackage)
-#     except ValueError as e:
-#         print(f"✅ Berhasil! Error yang diharapkan muncul: {e}")
+    print("Ciphertext telah diubah. Mencoba dekripsi...")
+    try:
+        decryptedData = decrypt(userPassword, encryptedPackage)
+    except ValueError as e:
+        print(f"✅ Berhasil! Error yang diharapkan muncul: {e}")

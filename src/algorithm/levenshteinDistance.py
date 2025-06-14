@@ -44,24 +44,25 @@ class LevenshteinCalculator:
 
 
 
-def fuzzyMatch(keyword: str, text: str, threshold: int) -> list[str]:
-    print(f"Mencari '{keyword}' di dalam teks dengan threshold <= {threshold}...")
+def fuzzyMatch(keywords: list[str], text: str, threshold: int) -> int:
+    # print(f"Mencari '{keyword}' di dalam teks dengan threshold <= {threshold}...")
     wordsInText = text.lower().split()
     #list buat nyimpen kata yg mungkin cocok
-    foundMatches = []
+    foundMatches = 0
     
     for word in wordsInText:
-        calculator = LevenshteinCalculator(keyword.lower(), word)
-        distance = calculator.calculate()
-        if distance <= threshold:
-            print(f"  -> Ditemukan kecocokan: '{word}' (jarak: {distance})")
-            foundMatches.append(word)
+        for keyword in keywords:
+            calculator = LevenshteinCalculator(keyword.lower(), word)
+            distance = calculator.calculate()
+            if distance <= threshold:
+                print(f"  -> Ditemukan kecocokan: '{word}' (jarak: {distance})")
+                foundMatches += 1
             
     return foundMatches
 
-contoh_teks_cv = "My main skill is programming with javva and pythin."
-kata_kunci = "java"
-ambang_batas = 2
+# contoh_teks_cv = "My main skill is programming with javva, jaa, and pythin."
+# kata_kunci = ["java"]
+# ambang_batas = 2
 
-kecocokan = fuzzyMatch(kata_kunci, contoh_teks_cv, ambang_batas)
-print(f"\nHasil akhir kata yang cocok: {kecocokan}")
+# kecocokan = fuzzyMatch(kata_kunci, contoh_teks_cv, ambang_batas)
+# print(f"\nHasil akhir kata yang cocok: {kecocokan}")
