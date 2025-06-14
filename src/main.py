@@ -53,8 +53,8 @@ def main(page : ft.Page):
             page.views.append(homepage(page))
         elif page.route == "/applicants":
             page.views.append(applicants(page))
-        elif page.route == "/results":
-            page.views.append(results(page))
+        # elif page.route == "/results":
+        #     page.views.append(results(page))
         elif page.route == "/jobs":
             page.views.append(jobs(page))
         page.update()

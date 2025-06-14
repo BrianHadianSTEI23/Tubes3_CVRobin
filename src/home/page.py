@@ -1,6 +1,10 @@
 import flet as ft
+from results.page import results
 
 def homepage(page : ft.Page):
+
+    # initiate global variables
+    keyword_list : list[str] = []
 
     page.fonts = {
         "Kanit": "https://raw.githubusercontent.com/google/fonts/master/ofl/kanit/Kanit-Bold.ttf",
@@ -17,10 +21,12 @@ def homepage(page : ft.Page):
             ),
         margin=ft.margin.symmetric(horizontal=20)
     )
+        
 
     # function to append the keyword
     def add_keyword(e):
         keyword = keyword_input.content.value
+        keyword_list.append(keyword)
         if keyword:
             keyword_output.content.controls.append(  # Append to the GridView!
                 ft.Container(
@@ -50,6 +56,41 @@ def homepage(page : ft.Page):
         margin=ft.margin.symmetric(horizontal=20),
     )
 
+    # search_algorithm
+    search_algorithm = ft.Container(
+                    content = ft.Dropdown(
+                            hint_text="Choose your algorithm", 
+                            color=ft.Colors.GREEN_900,
+                            options=[
+                                ft.dropdown.Option("Knuth-Morris-Pratt"),
+                                ft.dropdown.Option("Boyer-Moore"),
+                                ft.dropdown.Option("Aho-Corasick"),
+                                ],
+                            text_size=25,
+                            expand=True,
+                        ),
+                    margin = ft.margin.Margin(left=20, top = 20, right=20, bottom=20 ),
+                )
+    
+    # cv_count
+    cv_count = ft.Container(
+                    content = ft.TextField(
+                        hint_text="Insert your desirable CV count",
+                        color=ft.Colors.GREEN_900,
+                        text_size= 25,
+                        ), 
+                    margin = ft.margin.Margin(left=20, top = 0, right=20, bottom=0),
+                )
+
+    # function for search button
+    def search_all_cv(e):
+        keyword_to_search = keyword_list
+        total_cv_to_search = cv_count.content.value
+        search_algorithm_to_search = search_algorithm.content.value
+        page.views.clear()
+        page.views.append(results(page, keyword_to_search, total_cv_to_search, search_algorithm_to_search))
+        page.update()
+
     # left section construct (dark green)
     left_section = ft.Container(
         content=ft.Column(
@@ -67,6 +108,7 @@ def homepage(page : ft.Page):
                                         alignment=ft.alignment.top_left
                                     ),
                                     expand=True,  # allows button to grow inside expanding parent
+                                    on_click=lambda e: page.go("/")
                                 ),
                             ],
                             expand=True,  # allows container to grow horizontally
@@ -122,7 +164,6 @@ def homepage(page : ft.Page):
         padding=ft.padding.Padding(left = 30, right = 30, top = 200, bottom=30),
         width=333.3,
     )
-
 
     # right section construct (cream)
     right_section = ft.Container(
@@ -184,30 +225,10 @@ def homepage(page : ft.Page):
                 keyword_output,
 
                 # SEARCH ALGORITHM
-                ft.Container(
-                    content = ft.Dropdown(
-                            hint_text="Choose your algorithm", 
-                            color=ft.Colors.GREEN_900,
-                            options=[
-                                ft.dropdown.Option("Knuth-Morris-Pratt"),
-                                ft.dropdown.Option("Boyer-Moore"),
-                                ft.dropdown.Option("Aho-Corasick"),
-                                ],
-                            text_size=25,
-                            expand=True,
-                        ),
-                    margin = ft.margin.Margin(left=20, top = 20, right=20, bottom=20 ),
-                ),
+                search_algorithm,
 
                 # CV Count
-                ft.Container(
-                    content = ft.TextField(
-                        hint_text="Insert your desirable CV count",
-                        color=ft.Colors.GREEN_900,
-                        text_size= 25,
-                        ), 
-                    margin = ft.margin.Margin(left=20, top = 0, right=20, bottom=0),
-                ),
+                cv_count,
 
                 # search button
                 ft.Container(
@@ -222,6 +243,7 @@ def homepage(page : ft.Page):
                                     bgcolor=ft.Colors.GREEN_100,
                                 ),
                                 expand=True,  # allows button to grow inside expanding parent
+                                on_click=search_all_cv
                             ),
                         ],
                         expand=True,  # allows container to grow horizontally

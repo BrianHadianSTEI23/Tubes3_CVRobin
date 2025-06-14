@@ -2,7 +2,7 @@
 import flet as ft
 import mysql.connector
 
-def results(page : ft.Page):
+def results(page : ft.Page, keyword_list : list[str], cv_count_to_search : int, search_algorithm_to_search : str):
 
     # dummy data
     # format : application_role -> [total_applicant, cv_path]
@@ -56,18 +56,19 @@ def results(page : ft.Page):
 
     
     # get all aplicants data from the database
-    # conn = mysql.connector.connect(
-    #     host="localhost",
-    #     user="root",
-    #     password="",
-    #     database="cvrobin"
-    # )
+    conn = mysql.connector.connect(
+        host="mysql-66af4eb-cvrobin.g.aivencloud.com",
+        user="avnadmin",
+        password="AVNS_OwS64toTSD7MkC29m2-",
+        database="defaultdb",
+        port = 10647
+    )
 
     # # Create a cursor to execute queries
-    # cursor = conn.cursor()
+    cursor = conn.cursor()
 
     # # Execute a query
-    # cursor.execute("SELECT * FROM application_detail")
+    cursor.execute("SELECT * FROM application_detail")
 
     # ################################### THIS WILL BE CHANGED INTO REAL DATA, BUT FOR NOW IS STILL DUMMY DATA ####################################33
     # Fetch and print the results 
@@ -107,8 +108,8 @@ def results(page : ft.Page):
 
 
     # Close the cursor and connection
-    # cursor.close()
-    # conn.close()
+    cursor.close()
+    conn.close()
 
     # left section construct (dark green)
     left_section = ft.Container(
