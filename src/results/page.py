@@ -93,12 +93,12 @@ def results(page : ft.Page, keyword_list : list[str], cv_count_to_search : int, 
     # # Execute a query
     cursor.execute("SELECT * FROM applicant_profile NATURAL JOIN application_detail")
 
-    # debug
+    # fetch all
     # cursor.fetchall = (applicant_id, first_name, last_name, dob, address, phone, detail_id, application_role, cv_path)
     start_time = time()
     results_data = {}
     for el in cursor.fetchall():
-        if (found_count < cv_count_to_search):
+        if (found_count < int(cv_count_to_search)):
 
             # debug
             # print(f"applicant id : {el[0]}")
@@ -274,7 +274,7 @@ def results(page : ft.Page, keyword_list : list[str], cv_count_to_search : int, 
                                                         text="Summary",
                                                         bgcolor=ft.Colors.GREEN_900,
                                                         color="#efe9d9",
-                                                        on_click=lambda e: go_to_summary(e, results_data[result]["applicant_id"]),
+                                                        on_click=lambda e, applicant_id=results_data[result]["applicant_id"]: go_to_summary(e, applicant_id)
                                                     ),
                                                     padding=10
                                                 ),
@@ -283,7 +283,7 @@ def results(page : ft.Page, keyword_list : list[str], cv_count_to_search : int, 
                                                         text="View CV",
                                                         bgcolor=ft.Colors.GREEN_900,
                                                         color="#efe9d9",
-                                                        on_click=lambda e:view_cv(e, results_data[result]["applicant_id"])
+                                                        on_click=lambda e, applicant_id=results_data[result]["applicant_id"]: view_cv(e, applicant_id)
                                                     ),
                                                     padding=10
                                                 ),
@@ -307,8 +307,8 @@ def results(page : ft.Page, keyword_list : list[str], cv_count_to_search : int, 
 
 
     # Close the cursor and connection
-    # cursor.close()
-    # conn.close()
+    cursor.close()
+    conn.close()
 
     # left section construct (dark green)
     left_section = ft.Container(
@@ -425,7 +425,7 @@ def results(page : ft.Page, keyword_list : list[str], cv_count_to_search : int, 
                 # BANNER SECTION 
                 ft.Container(
                     content=ft.Text(
-                        "Results (" + str(process_time) + ") ms",
+                        "Results (" + str(process_time) + ") s",
                         color="#efe9d9",
                         size=25,
                         text_align=ft.TextAlign.RIGHT,

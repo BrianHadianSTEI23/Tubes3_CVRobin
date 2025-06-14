@@ -1,8 +1,13 @@
 
 import flet as ft
 import mysql.connector
+from algorithm.preprocessCV import CV
+from algorithm.encryptionModule import decrypt
 
 def summary(page : ft.Page, id_applicant : int):
+
+    # global variable
+    password = "abrarbrianfaqih"
 
     # dummy data
     summary_data = {
@@ -58,21 +63,53 @@ def summary(page : ft.Page, id_applicant : int):
     }
     
     # get all aplicants data from the database
-    # conn = mysql.connector.connect(
-    #     host="mysql-66af4eb-cvrobin.g.aivencloud.com",
-    #     user="avnadmin",
-    #     password="AVNS_OwS64toTSD7MkC29m2-",
-    #     database="defaultdb",
-    #     port = 10647
-    # )
+    conn = mysql.connector.connect(
+        host="mysql-66af4eb-cvrobin.g.aivencloud.com",
+        user="avnadmin",
+        password="AVNS_OwS64toTSD7MkC29m2-",
+        database="defaultdb",
+        port = 10647
+    )
 
-    # # Create a cursor to execute queries
-    # cursor = conn.cursor()
+    # Create a cursor to execute queries
+    cursor = conn.cursor()
 
-    # # # Execute a query
-    # cursor.execute("SELECT * FROM application_detail")
+    # # Execute a query
+    cursor.execute(f"SELECT * FROM applicant_profile NATURAL JOIN application_detail WHERE applicant_profile.applicant_id = {id_applicant}")
 
-    # ################################### THIS WILL BE CHANGED INTO REAL DATA, BUT FOR NOW IS STILL DUMMY DATA ####################################33
+    # fetch all
+    # cursor.fetchall = (applicant_id, first_name, last_name, dob, address, phone, detail_id, application_role, cv_path)
+    summary_data = {}
+    for el in cursor.fetchall():
+        cv_data = CV(decrypt(password, el[8]))
+
+        # update everything that can be updated 
+        summary_data = {}
+        summary_data.update({"applicant_id" : el[0]})
+        summary_data.update({"first_name" : decrypt(password, el[1])})
+        summary_data.update({"last_name" : decrypt(password, el[2])})
+        summary_data.update({"date_of_birth" :  decrypt(password, el[3])})
+        summary_data.update({"address" :  decrypt(password, el[4])})
+        summary_data.update({"phone_number" :  decrypt(password, el[5])})
+        summary_data.update({"detail_id": el[6]})
+        summary_data.update({"application_role" :  decrypt(password, el[7])})
+        summary_data.update({"cv_path" :  decrypt(password, el[8])})
+
+        # update summary
+        # summary_content = cv_data._parse_text()["summary"]
+
+        # update skills
+        skills_content = cv_data._parse_text()["skills"]
+        summary_data.update({"skills" : skills_content})
+
+        # update jobhistory
+        jobHistory_content = cv_data._parse_text()["jobHistory"]
+        summary_data.update({"jobHistory" : jobHistory_content})
+
+        # update education
+        education_content = cv_data._parse_text()["education"]
+        summary_data.update({"education" : education_content})
+
 
     # skill widget
     skills_widget = ft.Container(
@@ -190,105 +227,105 @@ def summary(page : ft.Page, id_applicant : int):
     
     # Fetch and print the results 
     summary_widgets = []
-    for result in summary_data:
+    # for key in summary_data:
         # wrap every data from database to be displayed on to the ui
-        summary_widgets.append(
-            ft.Container(
-                content= ft.Column(
-                    controls=[
-                        # applicant name
-                        ft.Container(
-                            content = ft.Column(
-                                controls=[
-                                    ft.Row(
+    summary_widgets.append(
+        ft.Container(
+            content= ft.Column(
+                controls=[
+                    # applicant name
+                    ft.Container(
+                        content = ft.Column(
+                            controls=[
+                                ft.Row(
+                                    controls = [
+                                        ft.Text(
+                                            summary_data["first_name"] + " " + summary_data["last_name"],
+                                            style=ft.TextStyle(
+                                                    size=20,
+                                                    weight=ft.FontWeight.W_500,
+                                                    word_spacing=5,
+                                                    color="#efe9d9"
+                                                )
+                                            ),
+                                    ]
+                                )
+                            ],
+                            expand=True,
+                        ),
+                        padding=ft.padding.Padding(left=15, right=15, top=10, bottom=5),
+                        bgcolor=ft.Colors.GREEN_900,
+                        expand=True,
+                        border_radius=15,
+                    ),
+
+                    # applicant birthdate, address, phone number
+                    ft.Container(
+                        content=ft.Column(
+                            controls=[
+                                ft.Container(
+                                    content = ft.Column(
                                         controls = [
+                                            # birthdate
                                             ft.Text(
-                                                summary_data["first_name"] + " " + summary_data["last_name"],
-                                                style=ft.TextStyle(
-                                                        size=20,
-                                                        weight=ft.FontWeight.W_500,
-                                                        word_spacing=5,
-                                                        color="#efe9d9"
+                                                    f"Birthdate : {summary_data["date_of_birth"]}",
+                                                    style=ft.TextStyle(
+                                                        size=15,
+                                                        weight=ft.FontWeight.W_400,
+                                                        color=ft.Colors.GREEN_900
+                                                    )
+                                                ),
+
+                                            # address
+                                            ft.Text(
+                                                    f"Address : {summary_data["address"]}",
+                                                    style=ft.TextStyle(
+                                                        size=15,
+                                                        weight=ft.FontWeight.W_400,
+                                                        color=ft.Colors.GREEN_900
+                                                    )
+                                                ),
+
+                                            # phone number
+                                            ft.Text(
+                                                    f"Phone Number : {summary_data["phone_number"]}",
+                                                    style=ft.TextStyle(
+                                                        size=15,
+                                                        weight=ft.FontWeight.W_400,
+                                                        color=ft.Colors.GREEN_900
                                                     )
                                                 ),
                                         ]
                                     )
-                                ],
-                                expand=True,
-                            ),
-                            padding=ft.padding.Padding(left=15, right=15, top=10, bottom=5),
-                            bgcolor=ft.Colors.GREEN_900,
-                            expand=True,
-                            border_radius=15,
+                                ),
+                                
+                                # skills
+                                skills_widget,
+
+                                # job history
+                                jobHistory_widget,
+
+                                # education
+                                education_widget,
+                            ],
                         ),
-
-                        # applicant birthdate, address, phone number
-                        ft.Container(
-                            content=ft.Column(
-                                controls=[
-                                    ft.Container(
-                                        content = ft.Column(
-                                            controls = [
-                                                # birthdate
-                                                ft.Text(
-                                                        f"Birthdate : {summary_data["date_of_birth"]}",
-                                                        style=ft.TextStyle(
-                                                            size=15,
-                                                            weight=ft.FontWeight.W_400,
-                                                            color=ft.Colors.GREEN_900
-                                                        )
-                                                    ),
-
-                                                # address
-                                                ft.Text(
-                                                        f"Address : {summary_data["address"]}",
-                                                        style=ft.TextStyle(
-                                                            size=15,
-                                                            weight=ft.FontWeight.W_400,
-                                                            color=ft.Colors.GREEN_900
-                                                        )
-                                                    ),
-
-                                                # phone number
-                                                ft.Text(
-                                                        f"Phone Number : {summary_data["phone_number"]}",
-                                                        style=ft.TextStyle(
-                                                            size=15,
-                                                            weight=ft.FontWeight.W_400,
-                                                            color=ft.Colors.GREEN_900
-                                                        )
-                                                    ),
-                                            ]
-                                        )
-                                    ),
-                                    
-                                    # skills
-                                    skills_widget,
-
-                                    # job history
-                                    jobHistory_widget,
-
-                                    # education
-                                    education_widget,
-                                ],
-                            ),
-                            bgcolor=ft.Colors.GREEN_100,
-                            border_radius=20,
-                            padding=10,
-                        ),
-                    ],
-                    expand=True,
-                    scroll=ft.ScrollMode.AUTO
-                ),
+                        bgcolor=ft.Colors.GREEN_100,
+                        border_radius=20,
+                        padding=10,
+                    ),
+                ],
                 expand=True,
-                padding=5,
-            )
+                scroll=ft.ScrollMode.AUTO
+            ),
+            expand=True,
+            padding=5,
         )
+    )
 
 
     # Close the cursor and connection
-    # cursor.close()
-    # conn.close()
+    cursor.close()
+    conn.close()
 
     # left section construct (dark green)
     left_section = ft.Container(

@@ -51,7 +51,7 @@ def homepage(page : ft.Page):
             color=ft.Colors.GREEN_900,
             text_size=25,
             on_submit=add_keyword,
-            content_padding=10,
+            content_padding=15,
         ),
         margin=ft.margin.symmetric(horizontal=20),
     )

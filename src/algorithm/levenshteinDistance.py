@@ -34,7 +34,7 @@ class LevenshteinCalculator:
                     self.dpMatrix[i-1][j-1] + substitutionCost
                 )
 
-        self.printMatrix()
+        # self.printMatrix()
         return self.dpMatrix[self.lenS1][self.lenS2]
 
     def printMatrix(self):
