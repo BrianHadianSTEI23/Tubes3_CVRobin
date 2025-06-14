@@ -2,6 +2,24 @@ import re
 import fitz
 import os
 
+''' command to create database 
+CREATE DATABASE cvrobin;
+CREATE TABLE applicant_profile (
+    applicant_id    INT NOT NULL AUTO INCREMENT PRIMARY KEY,
+    first_name  VARCHAR(50) DEFAULT NULL,
+    last_name  VARCHAR(50) DEFAULT NULL,
+    date_of_birth   DATE    DEFAULT NULL,
+    address VARCHAR(255) DEFAULT NULL,
+    phone_number    VARCHAR(20) DEFAULT NULL
+)
+CREATE TABLE application_detail (
+    detail_id   INT NOT NULL AUTO INCREMENT PRIMARY KEY,
+    applicant_id    INT NOT NULL,
+    application_role    VARCHAR(100) DEFAULT NULL,
+    cv_path     TEXT
+)
+'''
+
 class Job:
     def __init__(self, position: str, range: str, description: str):
         self.position = position
