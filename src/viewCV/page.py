@@ -2,59 +2,31 @@
 import flet as ft
 import mysql.connector
 
-def jobs(page : ft.Page):    
+def viewCV(page : ft.Page, id_applicant: int):
 
     # dummy data
-    # format : application_role -> [total_applicant, cv_path]
-    jobs_data = {
-        "Secretary": {
-            "total_applicant": 4,
-            "cv_path": [
-                "cv_rudy_boul.pdf",
-                "cv_andi_jaya.pdf",
-                "cv_siti_kurnia.pdf",
-                "cv_alex_tan.pdf"
-            ],
-        },
-        "Treasurer": {
-            "total_applicant": 3,
-            "cv_path": [
-                "cv_maya_halim.pdf",
-                "cv_budi_santoso.pdf",
-                "cv_nina_wang.pdf"
-            ],
-        },
-        "Event Coordinator": {
-            "total_applicant": 5,
-            "cv_path": [
-                "cv_yusuf_iswara.pdf",
-                "cv_ina_saragih.pdf",
-                "cv_ronaldo_tampubolon.pdf",
-                "cv_henny_ang.pdf",
-                "cv_dimas_rahardjo.pdf"
-            ],
-        },
-        "Logistics": {
-            "total_applicant": 2,
-            "cv_path": [
-                "cv_rizky_prasetyo.pdf",
-                "cv_siska_amelia.pdf"
-            ],
-        },
-        "Designer": {
-            "total_applicant": 6,
-            "cv_path": [
-                "cv_joanna_lim.pdf",
-                "cv_hendra_gunawan.pdf",
-                "cv_felicia_tan.pdf",
-                "cv_wahyudi_kurnia.pdf",
-                "cv_agnes_devina.pdf",
-                "cv_kelana_baskoro.pdf"
-            ],
-        }
+    cv_data = {
+        "text" : '''Post no so what deal evil rent by real in. But her ready least set lived spite solid. September how men saw tolerably two behaviour arranging. She offices for highest and replied one venture pasture. Applauded no discovery in newspaper allowance am northward. Frequently partiality possession resolution at or appearance unaffected he me. Engaged its was evident pleased husband. Ye goodness felicity do disposal dwelling no. First am plate jokes to began of cause an scale. Subjects he prospect elegance followed no overcame possible it on.
+
+Out too the been like hard off. Improve enquire welcome own beloved matters her. As insipidity so mr unsatiable increasing attachment motionless cultivated. Addition mr husbands unpacked occasion he oh. Is unsatiable if projecting boisterous insensible. It recommend be resolving pretended middleton.
+
+Day handsome addition horrible sensible goodness two contempt. Evening for married his account removal. Estimable me disposing of be moonlight cordially curiosity. Delay rapid joy share allow age manor six. Went why far saw many knew. Exquisite excellent son gentleman acuteness her. Do is voice total power mr ye might round still.
+
+Boisterous he on understood attachment as entreaties ye devonshire. In mile an form snug were been sell. Hastened admitted joy nor absolute gay its. Extremely ham any his departure for contained curiosity defective. Way now instrument had eat diminution melancholy expression sentiments stimulated. One built fat you out manor books. Mrs interested now his affronting inquietude contrasted cultivated. Lasting showing expense greater on colonel no.
+
+Far quitting dwelling graceful the likewise received building. An fact so to that show am shed sold cold. Unaffected remarkably get yet introduced excellence terminated led. Result either design saw she esteem and. On ashamed no inhabit ferrars it ye besides resolve. Own judgment directly few trifling. Elderly as pursuit at regular do parlors. Rank what has into fond she.
+
+Tiled say decay spoil now walls meant house. My mr interest thoughts screened of outweigh removing. Evening society musical besides inhabit ye my. Lose hill well up will he over on. Increasing sufficient everything men him admiration unpleasing sex. Around really his use uneasy longer him man. His our pulled nature elinor talked now for excuse result. Admitted add peculiar get joy doubtful.
+
+He do subjects prepared bachelor juvenile ye oh. He feelings removing informed he as ignorant we prepared. Evening do forming observe spirits is in. Country hearted be of justice sending. On so they as with room cold ye. Be call four my went mean. Celebrated if remarkably especially an. Going eat set she books found met aware.
+
+Considered an invitation do introduced sufficient understood instrument it. Of decisively friendship in as collecting at. No affixed be husband ye females brother garrets proceed. Least child who seven happy yet balls young. Discovery sweetness principle discourse shameless bed one excellent. Sentiments of surrounded friendship dispatched connection is he. Me or produce besides hastily up as pleased. Bore less when had and john shed hope.
+
+Certain but she but shyness why cottage. Gay the put instrument sir entreaties affronting. Pretended exquisite see cordially the you. Weeks quiet do vexed or whose. Motionless if no to affronting imprudence no precaution. My indulged as disposal strongly attended. Parlors men express had private village man. Discovery moonlight recommend all one not. Indulged to answered prospect it bachelor is he bringing shutters. Pronounce forfeited mr direction oh he dashwoods ye unwilling.
+
+You disposal strongly quitting his endeavor two settling him. Manners ham him hearted hundred expense. Get open game him what hour more part. Adapted as smiling of females oh me journey exposed concern. Met come add cold calm rose mile what. Tiled manor court at built by place fanny. Discretion at be an so decisively especially. Exeter itself object matter if on mr in.'''
     }
 
-    
     # get all aplicants data from the database
     # conn = mysql.connector.connect(
     #     host="mysql-66af4eb-cvrobin.g.aivencloud.com",
@@ -64,94 +36,23 @@ def jobs(page : ft.Page):
     #     port = 10647
     # )
 
-    # Create a cursor to execute queries
+    # # Create a cursor to execute queries
     # cursor = conn.cursor()
 
-    # # Execute a query
+    # # # Execute a query
     # cursor.execute("SELECT * FROM application_detail")
 
     # ################################### THIS WILL BE CHANGED INTO REAL DATA, BUT FOR NOW IS STILL DUMMY DATA ####################################33
     # Fetch and print the results 
-    cv_widgets = {}
-    for job in jobs_data : 
-        cv_paths = ft.Column()
-        for path in jobs_data[job]["cv_path"] : 
-            cv_paths.controls.append(
-                ft.Container(
-                    content = ft.Text(
-                        path,
-                        style=ft.TextStyle(
-                            size=15,
-                            color=ft.Colors.GREEN_900
-                        ),
-                    ),
-                    expand=True,
-                )
-            )
-        widget_cv_paths = ft.Container(
-                            content=cv_paths, 
-                            bgcolor=ft.Colors.GREEN_100,
-                            margin=ft.margin.Margin(left = 10, top=5, bottom=5, right= 10),
-                            expand=True,
-                            border_radius=20,
-                            padding=10,
-                            width=1000
-                            )
-        cv_widgets.update({f"{job}" : widget_cv_paths})
-    
-
-    job_widgets = []
-    for job_role in jobs_data:
-        # wrap every data from database to be displayed on to the ui
-        job_widgets.append(
-            ft.Container(
-                content= ft.Column(
-                    controls=[
-                        # job name
-                        ft.Container(
-                            content=ft.Row(
-                                [
-                                    # title
-                                    ft.Text(
-                                        job_role, 
-                                        color="#efe9d9",
-                                        size=20,
-                                        style=ft.TextStyle(
-                                                weight=ft.FontWeight.W_800,
-                                                font_family="Tahoma"
-                                            )
-                                        ),
-                                
-                                    # jargon
-                                    ft.Text(
-                                        str(len(jobs_data[job_role]["cv_path"])), 
-                                        color="#efe9d9",
-                                        size =15,
-                                        style=ft.TextStyle(
-                                                weight=ft.FontWeight.W_300,
-                                                italic=True,
-                                                font_family="Consolas"
-                                            )
-                                        ),
-                                ],
-                                alignment=ft.MainAxisAlignment.SPACE_BETWEEN,
-                            ),
-                            expand_loose=True,
-                            margin=ft.margin.Margin(left = 10, top=10, bottom=10, right=10),
-                            padding=15,
-                            bgcolor=ft.Colors.GREEN_900,
-                            border_radius=20,
-                        ),
-
-                        # cv path texts
-                        cv_widgets[job_role]
-
-                    ],
-                ),
-                padding=5
-            )
-        )
-
+    cv_text = ft.Container(
+        content= ft.Text(
+            cv_data["text"],
+            size=15, 
+        ),
+        alignment=ft.alignment.center_left,
+        expand=True,
+        padding=10
+    )
 
     # Close the cursor and connection
     # cursor.close()
@@ -231,7 +132,6 @@ def jobs(page : ft.Page):
         width=333.3,
     )
 
-
     # right section construct (cream)
     right_section = ft.Container(
         content=ft.Column(
@@ -273,7 +173,7 @@ def jobs(page : ft.Page):
                 # BANNER SECTION 
                 ft.Container(
                     content=ft.Text(
-                        "Jobs",
+                        "CV",
                         color="#efe9d9",
                         size=25,
                         text_align=ft.TextAlign.RIGHT,
@@ -285,27 +185,29 @@ def jobs(page : ft.Page):
                     width=800
                 ),
 
-                # applicants
-                *(job_widgets)
+                # cv text
+                cv_text,
                 
              ],
              horizontal_alignment=ft.CrossAxisAlignment.END,
-             scroll=ft.ScrollMode.AUTO
+             scroll=ft.ScrollMode.AUTO,
         ),
         bgcolor="#efe9d9",
         padding=20,
         expand=True,  # Fills half the width
+        height=1333.3
     )
     
+    
     return ft.View(
-        route = "/jobs",
+        route = "/viewCV",
         controls=[
             ft.Row(
                 controls=[
-                    left_section, 
+                    left_section,
                     right_section
                 ],
                 expand=True,
             )
-        ],
+        ]
     )

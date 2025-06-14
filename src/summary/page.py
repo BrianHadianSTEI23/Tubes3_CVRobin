@@ -1,70 +1,61 @@
 
 import flet as ft
 import mysql.connector
-from summary.page import summary
-from viewCV.page import viewCV
 
-def results(page : ft.Page, keyword_list : list[str], cv_count_to_search : int, search_algorithm_to_search : str):
+def summary(page : ft.Page, id_applicant : int):
 
     # dummy data
-    results_data = {
-        1: {
-            "first_name": "Rudy",
-            "last_name": "Boul",
-            "date_of_birth": "1234-09-12",
-            "address": "Ganesha St No. 39, Bandung, West Java, Indonesia",
-            "phone_number": "0291831842",
-            "match_keywords" : [
-                {
-                    "Java" : 2,
-                    "Python" : 1,
-                    "Programming" : 2,
-                }
-            ],
-            "cv_path" : "cv_rudy_boul",
-            "applicant_id" : 1
-        },
-        2: {
-            "first_name": "Dina",
-            "last_name": "Hartono",
-            "date_of_birth": "1996-02-24",
-            "address": "Jl. Asia Afrika No. 12, Bandung, West Java, Indonesia",
-            "phone_number": "081234567890",
-            "match_keywords" : [
-                {
-                    "Programming" : 2,
-                    "Python" : 1,
-                }
-            ],
-            "cv_path": "cv_dina_hartono",
-            "applicant_id" : 2
-        },
-        3: {
-            "first_name": "Andi",
-            "last_name": "Wijaya",
-            "date_of_birth": "1988-11-15",
-            "address": "Jl. Braga No. 3, Bandung, West Java, Indonesia",
-            "phone_number": "082112345678",
-            "match_keywords" : [
-                {
-                    "Java" : 2,
-                    "Python" : 1,
-                }
-            ],
-            "cv_path" : "cv_andi_wijaya",
-            "applicant_id" : 3
-        },
+    summary_data = {
+        "first_name": "Rudy",
+        "last_name": "Boul",
+        "date_of_birth": "1234-09-12",
+        "address": "Ganesha St No. 39, Bandung, West Java, Indonesia",
+        "phone_number": "0291831842",
+        "match_keywords" : [
+            {
+                "Java" : 2,
+                "Python" : 1,
+                "Programming" : 2,
+            }
+        ],
+        "cv_path" : "cv_rudy_boul",
+        "applicant_id" : 1,
+        "application_role" : "Designer",
+        "skills" : [
+            "React",
+            "Java",
+            "DevOps",
+        ],
+        "jobHistory" : [
+            {
+                "position" : "CTO",
+                "range" : "2003-2013",
+                "description": "leading technology"
+            },
+            {
+                "position" : "CEO",
+                "range" : "2001",
+                "description" : "lead nothing"
+            }
+        ],
+        "skills" : [
+            "React",
+            "Java",
+            "DevOps",
+        ],
+        "education" : [
+            {
+                "institution": "ITB",
+                "studyProgram": "IF",
+                "rangeYear": "2000-2003"
+            },
+            {
+                "institution": "Harvard",
+                "studyProgram": "Math",
+                "rangeYear": "1999-2000"
+            }
+        ]
     }
-
-    def go_to_summary(e, id_applicant : int):
-        page.views.clear()
-        page.views.append(summary(page, id_applicant))
-        page.update()
-
-    def view_cv(e, id_applicant: int):
-        page.views.clear()
-        page.views.append(viewCV(page, id_applicant))
-        page.update()
     
     # get all aplicants data from the database
     # conn = mysql.connector.connect(
@@ -82,11 +73,126 @@ def results(page : ft.Page, keyword_list : list[str], cv_count_to_search : int, 
     # cursor.execute("SELECT * FROM application_detail")
 
     # ################################### THIS WILL BE CHANGED INTO REAL DATA, BUT FOR NOW IS STILL DUMMY DATA ####################################33
+
+    # skill widget
+    skills_widget = ft.Container(
+        content=ft.Row(
+            controls=[
+                ft.Text(
+                    "Skills",
+                    color="#efe9d9",
+                )
+            ]
+        ),
+        bgcolor=ft.Colors.GREEN_900,
+        padding=10,
+        border_radius=15,
+    )
+    for skill in summary_data["skills"]:
+        skills_widget.content.controls.append(
+            ft.Container(
+                content=ft.Text(
+                    skill,
+                    color="#efe9d9",
+                ),
+                bgcolor=ft.Colors.GREEN_500,
+                padding=10,
+                border_radius=15,
+            ),
+        )
+
+    # job history widget
+    jobHistory_widget = ft.Container(
+        content=ft.Column(
+            controls=[
+                ft.Text(
+                    "Job History",
+                    color="#efe9d9",
+                )
+            ]
+        ),
+        bgcolor=ft.Colors.GREEN_900,
+        padding=10,
+        expand=True,
+        width=1000,
+        border_radius=15,
+    )
+    for jobHistory in summary_data["jobHistory"]:
+        jobHistory_widget.content.controls.append(
+            ft.Container(
+                content=ft.Column(
+                    controls=[
+                        ft.Text(
+                            jobHistory["position"],
+                            color="#efe9d9",
+                        ),
+
+                        ft.Text(
+                            jobHistory["range"],
+                            color="#efe9d9",
+                        ),
+
+                        ft.Text(
+                            jobHistory["description"],
+                            color="#efe9d9",
+                        )
+                    ]
+                ),
+                bgcolor=ft.Colors.GREEN_500,
+                padding=10,
+                border_radius=15,
+                width=1000,
+            ),
+        )
+
+    # education widget
+    education_widget = ft.Container(
+        content=ft.Column(
+            controls=[
+                ft.Text(
+                    "Education",
+                    color="#efe9d9",
+                )
+            ]
+        ),
+        bgcolor=ft.Colors.GREEN_900,
+        padding=10,
+        width=1000,
+        border_radius=15,
+    )
+    for education in summary_data["education"]:
+        education_widget.content.controls.append(
+            ft.Container(
+                content=ft.Column(
+                    controls=[
+                        ft.Text(
+                            education["institution"],
+                            color="#efe9d9",
+                        ),
+
+                        ft.Text(
+                            education["studyProgram"],
+                            color="#efe9d9",
+                        ),
+
+                        ft.Text(
+                            education["rangeYear"],
+                            color="#efe9d9",
+                        )
+                    ]
+                ),
+                bgcolor=ft.Colors.GREEN_500,
+                padding=10,
+                border_radius=15,
+                width=1000,
+            ),
+        )
+    
     # Fetch and print the results 
-    result_widgets = []
-    for result in results_data:
+    summary_widgets = []
+    for result in summary_data:
         # wrap every data from database to be displayed on to the ui
-        result_widgets.append(
+        summary_widgets.append(
             ft.Container(
                 content= ft.Column(
                     controls=[
@@ -97,7 +203,7 @@ def results(page : ft.Page, keyword_list : list[str], cv_count_to_search : int, 
                                     ft.Row(
                                         controls = [
                                             ft.Text(
-                                                results_data[result]["first_name"] + " " + results_data[result]["last_name"],
+                                                summary_data["first_name"] + " " + summary_data["last_name"],
                                                 style=ft.TextStyle(
                                                         size=20,
                                                         weight=ft.FontWeight.W_500,
@@ -125,7 +231,7 @@ def results(page : ft.Page, keyword_list : list[str], cv_count_to_search : int, 
                                             controls = [
                                                 # birthdate
                                                 ft.Text(
-                                                        f"Birthdate : {results_data[result]["date_of_birth"]}",
+                                                        f"Birthdate : {summary_data["date_of_birth"]}",
                                                         style=ft.TextStyle(
                                                             size=15,
                                                             weight=ft.FontWeight.W_400,
@@ -135,7 +241,7 @@ def results(page : ft.Page, keyword_list : list[str], cv_count_to_search : int, 
 
                                                 # address
                                                 ft.Text(
-                                                        f"Address : {results_data[result]["address"]}",
+                                                        f"Address : {summary_data["address"]}",
                                                         style=ft.TextStyle(
                                                             size=15,
                                                             weight=ft.FontWeight.W_400,
@@ -145,7 +251,7 @@ def results(page : ft.Page, keyword_list : list[str], cv_count_to_search : int, 
 
                                                 # phone number
                                                 ft.Text(
-                                                        f"Phone Number : {results_data[result]["phone_number"]}",
+                                                        f"Phone Number : {summary_data["phone_number"]}",
                                                         style=ft.TextStyle(
                                                             size=15,
                                                             weight=ft.FontWeight.W_400,
@@ -156,31 +262,14 @@ def results(page : ft.Page, keyword_list : list[str], cv_count_to_search : int, 
                                         )
                                     ),
                                     
-                                    # buttons
-                                    ft.Container(
-                                        content=ft.Row(
-                                            controls=[
-                                                ft.Container(
-                                                        content = ft.ElevatedButton(
-                                                        text="Summary",
-                                                        bgcolor=ft.Colors.GREEN_900,
-                                                        color="#efe9d9",
-                                                        on_click=lambda e: go_to_summary(e, results_data[result]["applicant_id"]),
-                                                    ),
-                                                    padding=10
-                                                ),
-                                                ft.Container(
-                                                        content = ft.ElevatedButton(
-                                                        text="View CV",
-                                                        bgcolor=ft.Colors.GREEN_900,
-                                                        color="#efe9d9",
-                                                        on_click=lambda e:view_cv(e, results_data[result]["applicant_id"])
-                                                    ),
-                                                    padding=10
-                                                ),
-                                            ]
-                                        ),
-                                    )
+                                    # skills
+                                    skills_widget,
+
+                                    # job history
+                                    jobHistory_widget,
+
+                                    # education
+                                    education_widget,
                                 ],
                             ),
                             bgcolor=ft.Colors.GREEN_100,
@@ -316,7 +405,7 @@ def results(page : ft.Page, keyword_list : list[str], cv_count_to_search : int, 
                 # BANNER SECTION 
                 ft.Container(
                     content=ft.Text(
-                        "Results",
+                        "Summary",
                         color="#efe9d9",
                         size=25,
                         text_align=ft.TextAlign.RIGHT,
@@ -329,7 +418,7 @@ def results(page : ft.Page, keyword_list : list[str], cv_count_to_search : int, 
                 ),
 
                 # applicants
-                *result_widgets
+                *summary_widgets
                 
              ],
              horizontal_alignment=ft.CrossAxisAlignment.END,
@@ -342,7 +431,7 @@ def results(page : ft.Page, keyword_list : list[str], cv_count_to_search : int, 
     
     
     return ft.View(
-        route = "/results",
+        route = "/summary",
         controls=[
             ft.Row(
                 controls=[
