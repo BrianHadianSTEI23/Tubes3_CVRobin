@@ -1,6 +1,6 @@
 import re
-import fitz
 import os
+import fitz
 
 ''' command to create database 
 CREATE DATABASE cvrobin;
@@ -57,6 +57,12 @@ class CV:
             print(f"Error reading {file_path}: {e}")
             return ""
 
+    def _clean_text(self, text: str) -> str:
+        text = re.sub(r'[ï¼�â€"â€™]+', '', text)
+        text = re.sub(r'\s+', ' ', text)
+        text = re.sub(r'\n\s*\n', '\n', text)
+        return text.strip()
+
     def _find_sections(self, text: str) -> dict:
         section_keywords = {
             'summary': ['summary', 'profile', 'objective', 'professional profile', 'career overview', 'career summary', 'professional summary', 'overview'],
@@ -94,15 +100,13 @@ class CV:
                 
         return sections
 
-    def _extract_dates_advanced(self, text: str) -> list:
+    def _extract_dates_enhanced(self, text: str) -> list[tuple]:
         date_patterns = [
             r'\b(?:Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec|January|February|March|April|June|July|August|September|October|November|December)[\s,.]*\d{2,4}\b\s*[-–—to]+\s*\b(?:Present|Current|Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec|January|February|March|April|June|July|August|September|October|November|December)[\s,.]*\d{2,4}\b',
             r'\b\d{4}\s*[-–—to]+\s*(?:\d{4}|Present|Current)\b',
             r'\b\d{1,2}[/-]\d{4}\s*[-–—to]+\s*(?:\d{1,2}[/-]\d{4}|Present|Current)\b',
             r'\b(?:Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec|January|February|March|April|June|July|August|September|October|November|December)\s+\d{4}\s*[-–—,to]+\s*(?:Present|Current|Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec|January|February|March|April|June|July|August|September|October|November|December)\s+\d{4}',
-            r'\d{2}/\d{2}/\d{4}\s*[-–—to]+\s*(?:\d{2}/\d{2}/\d{4}|Present|Current)',
             r'since\s+\d{4}|from\s+\d{4}',
-            r'\b\d{4}\b.*?(?:to|-).*?\b(?:\d{4}|present|current)\b'
         ]
         
         found_dates = []
@@ -113,10 +117,11 @@ class CV:
         
         return found_dates
 
-    def _parse_experience_advanced(self, content: str) -> list:
+    def _parse_experience_enhanced(self, content: str) -> list[dict[str, str]]:
         jobs = []
+        content = self._clean_text(content)
         
-        date_matches = self._extract_dates_advanced(content)
+        date_matches = self._extract_dates_enhanced(content)
         
         if date_matches:
             date_matches.sort()
@@ -125,27 +130,32 @@ class CV:
                 start_search = date_matches[i-1][0] + len(date_matches[i-1][1]) if i > 0 else 0
                 end_search = date_matches[i+1][0] if i + 1 < len(date_matches) else len(content)
                 
-                job_block = content[start_search:end_search].strip()
+                before_date = content[start_search:date_pos].strip()
+                after_date = content[date_pos + len(date_str):end_search].strip()
                 
-                lines_before_date = content[start_search:date_pos].strip().split('\n')
-                lines_after_date = content[date_pos + len(date_str):end_search].strip().split('\n')
+                lines_before = before_date.split('\n')
+                position = "Position Not Specified"
                 
-                position_candidates = []
-                for line in reversed(lines_before_date):
+                for line in reversed(lines_before):
                     line = line.strip()
                     if line and len(line.split()) <= 8:
-                        position_candidates.append(line)
+                        if (re.search(r'(?i)\b(manager|director|supervisor|chef|analyst|specialist|consultant|technician|engineer|coordinator|assistant|officer|representative|developer|instructor|lecturer)\b', line) or
+                            re.match(r'^[A-Z][A-Za-z\s&/\-]+$', line)):
+                            position = line
+                            break
                 
-                position = position_candidates[0] if position_candidates else "Position Not Specified"
-                
+                description_lines = after_date.split('\n')
                 description_parts = []
-                if len(lines_before_date) > 1:
-                    description_parts.extend(lines_before_date[:-1])
-                description_parts.extend(lines_after_date)
+                for line in description_lines:
+                    line = line.strip()
+                    if line and len(line) > 10:
+                        if re.search(r'(?i)^[A-Z][A-Za-z\s&/\-]+(?:Manager|Director|Supervisor|Chef|Analyst)$', line):
+                            break
+                        description_parts.append(line)
                 
-                description = '\n'.join([l.strip() for l in description_parts if l.strip()]).strip()
+                description = '\n'.join(description_parts[:3])
                 
-                if position and date_str:
+                if position != "Position Not Specified" or description:
                     jobs.append({
                         "position": position,
                         "range": date_str,
@@ -153,70 +163,35 @@ class CV:
                     })
         
         if not jobs:
-            lines = [line.strip() for line in content.split('\n') if line.strip()]
-            
-            i = 0
-            while i < len(lines):
-                line = lines[i]
-                
-                if re.search(r'\b\d{4}\b', line):
-                    position_lines = []
-                    j = max(0, i-3)
-                    while j < i:
-                        if lines[j] and not re.search(r'\b\d{4}\b', lines[j]):
-                            position_lines.append(lines[j])
-                        j += 1
-                    
-                    position = ' - '.join(position_lines) if position_lines else "Position Not Specified"
-                    date_range = line
-                    
-                    description_lines = []
-                    j = i + 1
-                    while j < len(lines) and j < i + 5:
-                        if not re.search(r'\b\d{4}\b', lines[j]):
-                            description_lines.append(lines[j])
-                        else:
-                            break
-                        j += 1
-                    
-                    description = '\n'.join(description_lines)
-                    
-                    jobs.append({
-                        "position": position,
-                        "range": date_range,
-                        "description": description
-                    })
-                
-                i += 1
-        
-        if not jobs:
-            job_keywords = ['manager', 'assistant', 'coordinator', 'analyst', 'specialist', 'director', 'supervisor', 'officer', 'representative', 'consultant', 'technician', 'engineer', 'developer']
+            job_keywords = ['manager', 'assistant', 'coordinator', 'analyst', 'specialist', 'director', 'supervisor', 'officer', 'chef', 'consultant', 'technician', 'engineer', 'developer']
             
             lines = [line.strip() for line in content.split('\n') if line.strip()]
+            found_jobs = []
+            
             for i, line in enumerate(lines):
                 if any(keyword in line.lower() for keyword in job_keywords):
-                    position = line
-                    
-                    date_range = "Date Not Specified"
-                    for j in range(max(0, i-2), min(len(lines), i+3)):
-                        if re.search(r'\b\d{4}\b', lines[j]):
-                            date_range = lines[j]
+                    if line not in [job['position'] for job in found_jobs]:
+                        date_range = "Date Not Specified"
+                        for j in range(max(0, i-2), min(len(lines), i+3)):
+                            if re.search(r'\b\d{4}\b', lines[j]):
+                                date_range = lines[j]
+                                break
+                        
+                        description_lines = []
+                        for j in range(i+1, min(len(lines), i+4)):
+                            if not any(kw in lines[j].lower() for kw in job_keywords):
+                                description_lines.append(lines[j])
+                        
+                        found_jobs.append({
+                            "position": line,
+                            "range": date_range,
+                            "description": '\n'.join(description_lines)
+                        })
+                        
+                        if len(found_jobs) >= 5:
                             break
-                    
-                    description_lines = []
-                    for j in range(i+1, min(len(lines), i+4)):
-                        if j < len(lines):
-                            description_lines.append(lines[j])
-                    
-                    description = '\n'.join(description_lines)
-                    
-                    jobs.append({
-                        "position": position,
-                        "range": date_range,
-                        "description": description
-                    })
-                    
-                    break
+            
+            jobs = found_jobs
         
         return jobs
 
@@ -349,10 +324,10 @@ class CV:
                 break
         
         if exp_content:
-            output['jobHistory'] = self._parse_experience_advanced(exp_content)
+            output['jobHistory'] = self._parse_experience_enhanced(exp_content)
         
         if not output['jobHistory']:
-            output['jobHistory'] = self._parse_experience_advanced(text)
+            output['jobHistory'] = self._parse_experience_enhanced(text)
 
         edu_content = None
         for edu_key in ['education', 'academic background', 'training', 'education and training']:
