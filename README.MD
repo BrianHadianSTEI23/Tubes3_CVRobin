@@ -5,6 +5,10 @@
 
 </div>
 
+<div align="center">
+  <img src="https://github.com/BrianHadianSTEI23/CVRobin/blob/main/readmeImage.jpeg" alt="Image" width="800"/>
+</div>
+
 **CVRobin** adalah sebuah *Applicant Tracking System* (ATS) berbasis desktop yang dirancang untuk menyederhanakan dan mengoptimalkan proses rekrutmen. Dibangun dengan Flet dan Python, aplikasi ini mampu mem-parsing, menganalisis, dan mencocokkan CV secara cerdas menggunakan serangkaian algoritma pencocokan string yang canggih.
 
 Proyek ini merupakan Tugas Besar 3 untuk mata kuliah IF2211 Strategi Algoritma di Institut Teknologi Bandung.
