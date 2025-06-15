@@ -62,9 +62,13 @@ cd CVRobin
 uv venv
 
 # 4. Aktifkan virtual environment
+source .venv/bin/activate
 
 # 5. Instal semua dependensi yang diperlukan
-
+uv pip install pymupdf
+uv pip install mysql
+uv pip install flet
+uv pip install faker
 
 ### 3. Konfigurasi Database
 Aplikasi ini memerlukan koneksi ke database MySQL.
@@ -76,7 +80,7 @@ Aplikasi ini memerlukan koneksi ke database MySQL.
 Setelah semua dependensi terinstal dan database terkonfigurasi, jalankan aplikasi dengan perintah berikut:
 
 ```bash
-
+    uv run src/main.py
 ```
 
 Aplikasi CVRobin akan terbuka, dan Anda siap untuk mulai menganalisis CV!
