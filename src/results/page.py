@@ -95,7 +95,9 @@ def results(page : ft.Page, keyword_list : list[str], cv_count_to_search : int, 
 
     # fetch all
     # cursor.fetchall = (applicant_id, first_name, last_name, dob, address, phone, detail_id, application_role, cv_path)
-    start_time = time()
+    start_time = 0
+    fuzzy_process_time = 0
+    exact_process_time = 0
     results_data = {}
     for el in cursor.fetchall():
         if (found_count < int(cv_count_to_search)):
@@ -129,12 +131,21 @@ def results(page : ft.Page, keyword_list : list[str], cv_count_to_search : int, 
             cv_data = CV(decrypt(password, el[8]))
             if (search_algorithm_to_search == "Boyer-Moore"):
                 # scan using boyer moore
+                exact_start_time = time()
                 keyword_match_data = boyerMooreMatch(cv_data.continuousText, keyword_list)
+                print(keyword_match_data)
+                exact_end_time = time()
+                exact_process_time += exact_end_time - exact_start_time
+
+                # fuzzy match
+                fuzzy_start_time = time()
                 for keyword in keyword_list: # there are no keyword match -> fuzzy matching
                     if keyword not in keyword_match_data:
                         fuzzy_result = fuzzyMatch(list(keyword), cv_data.continuousText, threshold)
                         if fuzzy_result:
                             keyword_match_data.update({keyword : fuzzyMatch(list(keyword), cv_data.continuousText, threshold)})
+                fuzzy_end_time = time()
+                fuzzy_process_time += fuzzy_end_time - fuzzy_start_time
 
                 # check if all the keyword exist and if yes, add the found count
                 all_exist = True
@@ -148,12 +159,21 @@ def results(page : ft.Page, keyword_list : list[str], cv_count_to_search : int, 
                     
             elif (search_algorithm_to_search == "Knuth-Morris-Pratt"):
                 # scan using kmp
+                exact_start_time = time()
                 keyword_match_data = knuthMorrisPrattMatch(cv_data.continuousText, keyword_list)
+                exact_end_time = time()
+                exact_process_time += exact_end_time - exact_start_time
+
+                # fuzzy match
+                fuzzy_start_time = time()
                 for keyword in keyword_list: # there are no keyword match -> fuzzy matching
                     if keyword not in keyword_match_data:
                         fuzzy_result = fuzzyMatch(list(keyword), cv_data.continuousText, threshold)
                         if fuzzy_result:
                             keyword_match_data.update({keyword : fuzzyMatch(list(keyword), cv_data.continuousText, threshold)})
+                fuzzy_end_time = time()
+                fuzzy_process_time += fuzzy_end_time - fuzzy_start_time
+
 
                 # check if all the keyword exist and if yes, add the found count
                 all_exist = True
@@ -166,12 +186,20 @@ def results(page : ft.Page, keyword_list : list[str], cv_count_to_search : int, 
                     found_count += 1
             elif (search_algorithm_to_search == "Aho-Corasick"):
                 # scan using ah
+                exact_start_time = time()
                 keyword_match_data = ahoCorasickMatch(cv_data.continuousText, keyword_list)
+                exact_end_time = time()
+                exact_process_time += exact_end_time - exact_start_time
+
+                # fuzzy matching
+                fuzzy_start_time = time()
                 for keyword in keyword_list: # there are no keyword match -> fuzzy matching
                     if keyword not in keyword_match_data:
                         fuzzy_result = fuzzyMatch(list(keyword), cv_data.continuousText, threshold)
                         if fuzzy_result:
                             keyword_match_data.update({keyword : fuzzyMatch(list(keyword), cv_data.continuousText, threshold)})
+                fuzzy_end_time = time()
+                fuzzy_process_time += fuzzy_end_time - fuzzy_start_time
 
                 # check if all the keyword exist and if yes, add the found count
                 all_exist = True
@@ -184,16 +212,27 @@ def results(page : ft.Page, keyword_list : list[str], cv_count_to_search : int, 
                     found_count += 1
             results_data.update({el[0] : applicant_id_data})
 
-    # count time
-    end_time = time()
-    process_time = end_time - start_time
-
-
 
     # ################################### THIS WILL BE CHANGED INTO REAL DATA, BUT FOR NOW IS STILL DUMMY DATA ####################################33
     # Fetch and print the results 
     result_widgets = []
     for result in results_data:
+        # get the keywords
+        match_keywords_widget = ft.Container(
+            content= ft.Column(),
+        )
+        for keyword in results_data[result]["match_keywords"]:
+            match_keywords_widget.content.controls.append(
+                ft.Text(
+                        f"{keyword} : {results_data[result]["match_keywords"][keyword]}",
+                        style=ft.TextStyle(
+                            size=15,
+                            weight=ft.FontWeight.W_400,
+                            color=ft.Colors.GREEN_900
+                        )
+                    ),
+            )
+
         # wrap every data from database to be displayed on to the ui
         result_widgets.append(
             ft.Container(
@@ -232,7 +271,7 @@ def results(page : ft.Page, keyword_list : list[str], cv_count_to_search : int, 
                                     ft.Container(
                                         content = ft.Column(
                                             controls = [
-                                                # birthdate
+                                                # match keywords
                                                 ft.Text(
                                                         f"Birthdate : {results_data[result]["date_of_birth"]}",
                                                         style=ft.TextStyle(
@@ -261,6 +300,9 @@ def results(page : ft.Page, keyword_list : list[str], cv_count_to_search : int, 
                                                             color=ft.Colors.GREEN_900
                                                         )
                                                     ),
+                                                
+                                                # match keywords
+                                                match_keywords_widget
                                             ]
                                         )
                                     ),
@@ -424,11 +466,33 @@ def results(page : ft.Page, keyword_list : list[str], cv_count_to_search : int, 
 
                 # BANNER SECTION 
                 ft.Container(
-                    content=ft.Text(
-                        "Results (" + str(process_time) + ") s",
-                        color="#efe9d9",
-                        size=25,
-                        text_align=ft.TextAlign.RIGHT,
+                    content = ft.Column(
+                        controls = [
+                            # banner
+                            ft.Text(
+                                "Results",
+                                color="#efe9d9",
+                                size=25,
+                                text_align=ft.TextAlign.RIGHT,
+                            ),
+
+                            # exact process time
+                            ft.Text(
+                                "Exact Process Time : " + str(exact_process_time) + " s",
+                                color="#efe9d9",
+                                size=15,
+                                text_align=ft.TextAlign.RIGHT,
+                            ),
+
+                            # fuzzy process time
+                            ft.Text(
+                                "Fuzzy Process Time : " + str(fuzzy_process_time) + " s",
+                                color="#efe9d9",
+                                size=15,
+                                text_align=ft.TextAlign.RIGHT,
+                            ),
+                        ],
+                        horizontal_alignment=ft.CrossAxisAlignment.END,
                     ),
                     bgcolor=ft.Colors.GREEN_900,
                     padding=20,
