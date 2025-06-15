@@ -58,24 +58,15 @@ cd CVRobin
 uv venv
 
 # 4. Aktifkan virtual environment
-# Pada Windows (CMD):
-# .\.venv\Scripts\activate
-# Pada MacOS/Linux:
-# source .venv/bin/activate
 
 # 5. Instal semua dependensi yang diperlukan
-uv pip install -r requirements.txt
-```
+
 
 ### 3. Konfigurasi Database
 Aplikasi ini memerlukan koneksi ke database MySQL.
 
-1.  Buat sebuah file bernama `.env` di dalam direktori root proyek.
-2.  Salin konten dari `.env.example` ke dalam file `.env` Anda.
-3.  Isi kredensial database MySQL Anda pada file `.env`.
 
 ```.env
-# Contoh isi file .env
 
 ```
 
@@ -83,7 +74,7 @@ Aplikasi ini memerlukan koneksi ke database MySQL.
 Setelah semua dependensi terinstal dan database terkonfigurasi, jalankan aplikasi dengan perintah berikut:
 
 ```bash
-uv run src/main.py
+
 ```
 
 Aplikasi CVRobin akan terbuka, dan Anda siap untuk mulai menganalisis CV!
