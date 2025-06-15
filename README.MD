@@ -6,7 +6,7 @@
 </div>
 
 <div align="center">
-  <img src="https://github.com/BrianHadianSTEI23/CVRobin/blob/main/readmeImage.jpeg" alt="Image" width="800"/>
+  <img src="https://github.com/BrianHadianSTEI23/CVRobin/blob/main/readmeImage.jpeg" alt="Image" width="600"/>
 </div>
 
 **CVRobin** adalah sebuah *Applicant Tracking System* (ATS) berbasis desktop yang dirancang untuk menyederhanakan dan mengoptimalkan proses rekrutmen. Dibangun dengan Flet dan Python, aplikasi ini mampu mem-parsing, menganalisis, dan mencocokkan CV secara cerdas menggunakan serangkaian algoritma pencocokan string yang canggih.
@@ -69,8 +69,6 @@ uv venv
 ### 3. Konfigurasi Database
 Aplikasi ini memerlukan koneksi ke database MySQL.
 
-
-```.env
 
 ```
 
