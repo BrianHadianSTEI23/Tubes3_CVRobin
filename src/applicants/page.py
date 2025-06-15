@@ -2,113 +2,139 @@
 
 import flet as ft
 import mysql.connector
+from algorithm.encryptionModule import decrypt
 
 def applicants(page : ft.Page) :
 
+    # global variables
+    password = "abrarbrianfaqih"
+    max_applicant_to_display = 10
+
     # dummy data
     # format : appicant_id -> [first_name, last_name, dob, address, phone_number]
-    applicants_data = {
-        1: {
-            "first_name": "Rudy",
-            "last_name": "Boul",
-            "date_of_birth": "1234-09-12",
-            "address": "Ganesha St No. 39, Bandung, West Java, Indonesia",
-            "phone_number": "0291831842"
-        },
-        2: {
-            "first_name": "Dina",
-            "last_name": "Hartono",
-            "date_of_birth": "1996-02-24",
-            "address": "Jl. Asia Afrika No. 12, Bandung, West Java, Indonesia",
-            "phone_number": "081234567890"
-        },
-        3: {
-            "first_name": "Andi",
-            "last_name": "Wijaya",
-            "date_of_birth": "1988-11-15",
-            "address": "Jl. Braga No. 3, Bandung, West Java, Indonesia",
-            "phone_number": "082112345678"
-        },
-        4: {
-            "first_name": "Siti",
-            "last_name": "Rahmawati",
-            "date_of_birth": "1992-05-08",
-            "address": "Jl. Dago Atas No. 45, Bandung, West Java, Indonesia",
-            "phone_number": "081987654321"
-        },
-        5: {
-            "first_name": "Budi",
-            "last_name": "Santoso",
-            "date_of_birth": "2000-07-30",
-            "address": "Jl. Setiabudi No. 18, Bandung, West Java, Indonesia",
-            "phone_number": "083812341234"
-        },
-        6: {
-            "first_name": "Budi",
-            "last_name": "Santoso",
-            "date_of_birth": "2000-07-30",
-            "address": "Jl. Setiabudi No. 18, Bandung, West Java, Indonesia",
-            "phone_number": "083812341234"
-        },
-        7: {
-            "first_name": "Budi",
-            "last_name": "Santoso",
-            "date_of_birth": "2000-07-30",
-            "address": "Jl. Setiabudi No. 18, Bandung, West Java, Indonesia",
-            "phone_number": "083812341234"
-        },
-        8: {
-            "first_name": "Budi",
-            "last_name": "Santoso",
-            "date_of_birth": "2000-07-30",
-            "address": "Jl. Setiabudi No. 18, Bandung, West Java, Indonesia",
-            "phone_number": "083812341234"
-        },
-        9: {
-            "first_name": "Budi",
-            "last_name": "Santoso",
-            "date_of_birth": "2000-07-30",
-            "address": "Jl. Setiabudi No. 18, Bandung, West Java, Indonesia",
-            "phone_number": "083812341234"
-        },
-        10: {
-            "first_name": "Budi",
-            "last_name": "Santoso",
-            "date_of_birth": "2000-07-30",
-            "address": "Jl. Setiabudi No. 18, Bandung, West Java, Indonesia",
-            "phone_number": "083812341234"
-        },
-        11: {
-            "first_name": "Budi",
-            "last_name": "Santoso",
-            "date_of_birth": "2000-07-30",
-            "address": "Jl. Setiabudi No. 18, Bandung, West Java, Indonesia",
-            "phone_number": "083812341234"
-        },
-    }
+    # applicants_data = {
+    #     1: {
+    #         "first_name": "Rudy",
+    #         "last_name": "Boul",
+    #         "date_of_birth": "1234-09-12",
+    #         "address": "Ganesha St No. 39, Bandung, West Java, Indonesia",
+    #         "phone_number": "0291831842"
+    #     },
+    #     2: {
+    #         "first_name": "Dina",
+    #         "last_name": "Hartono",
+    #         "date_of_birth": "1996-02-24",
+    #         "address": "Jl. Asia Afrika No. 12, Bandung, West Java, Indonesia",
+    #         "phone_number": "081234567890"
+    #     },
+    #     3: {
+    #         "first_name": "Andi",
+    #         "last_name": "Wijaya",
+    #         "date_of_birth": "1988-11-15",
+    #         "address": "Jl. Braga No. 3, Bandung, West Java, Indonesia",
+    #         "phone_number": "082112345678"
+    #     },
+    #     4: {
+    #         "first_name": "Siti",
+    #         "last_name": "Rahmawati",
+    #         "date_of_birth": "1992-05-08",
+    #         "address": "Jl. Dago Atas No. 45, Bandung, West Java, Indonesia",
+    #         "phone_number": "081987654321"
+    #     },
+    #     5: {
+    #         "first_name": "Budi",
+    #         "last_name": "Santoso",
+    #         "date_of_birth": "2000-07-30",
+    #         "address": "Jl. Setiabudi No. 18, Bandung, West Java, Indonesia",
+    #         "phone_number": "083812341234"
+    #     },
+    #     6: {
+    #         "first_name": "Budi",
+    #         "last_name": "Santoso",
+    #         "date_of_birth": "2000-07-30",
+    #         "address": "Jl. Setiabudi No. 18, Bandung, West Java, Indonesia",
+    #         "phone_number": "083812341234"
+    #     },
+    #     7: {
+    #         "first_name": "Budi",
+    #         "last_name": "Santoso",
+    #         "date_of_birth": "2000-07-30",
+    #         "address": "Jl. Setiabudi No. 18, Bandung, West Java, Indonesia",
+    #         "phone_number": "083812341234"
+    #     },
+    #     8: {
+    #         "first_name": "Budi",
+    #         "last_name": "Santoso",
+    #         "date_of_birth": "2000-07-30",
+    #         "address": "Jl. Setiabudi No. 18, Bandung, West Java, Indonesia",
+    #         "phone_number": "083812341234"
+    #     },
+    #     9: {
+    #         "first_name": "Budi",
+    #         "last_name": "Santoso",
+    #         "date_of_birth": "2000-07-30",
+    #         "address": "Jl. Setiabudi No. 18, Bandung, West Java, Indonesia",
+    #         "phone_number": "083812341234"
+    #     },
+    #     10: {
+    #         "first_name": "Budi",
+    #         "last_name": "Santoso",
+    #         "date_of_birth": "2000-07-30",
+    #         "address": "Jl. Setiabudi No. 18, Bandung, West Java, Indonesia",
+    #         "phone_number": "083812341234"
+    #     },
+    #     11: {
+    #         "first_name": "Budi",
+    #         "last_name": "Santoso",
+    #         "date_of_birth": "2000-07-30",
+    #         "address": "Jl. Setiabudi No. 18, Bandung, West Java, Indonesia",
+    #         "phone_number": "083812341234"
+    #     },
+    # }
 
     
     # get all aplicants data from the database
-    # conn = mysql.connector.connect(
-    #     host="mysql-66af4eb-cvrobin.g.aivencloud.com",
-    #     user="avnadmin",
-    #     password="AVNS_OwS64toTSD7MkC29m2-",
-    #     database="defaultdb",
-    #     port = 10647
-    # )
+    conn = mysql.connector.connect(
+        host="mysql-66af4eb-cvrobin.g.aivencloud.com",
+        user="avnadmin",
+        password="AVNS_OwS64toTSD7MkC29m2-",
+        database="defaultdb",
+        port = 10647
+    )
 
-    # # Create a cursor to execute queries
-    # cursor = conn.cursor()
+    # Create a cursor to execute queries
+    cursor = conn.cursor()
 
-    # # Execute a query
-    # cursor.execute("SELECT * FROM applicant_profile")
+    # Execute a query
+    cursor.execute("SELECT * FROM applicant_profile")
 
     # ################################### THIS WILL BE CHANGED INTO REAL DATA, BUT FOR NOW IS STILL DUMMY DATA ####################################33
     # Fetch and print the results 
+    count = 0
+    applicants_data = {}
+    for el in cursor.fetchall():
+        # debug
+        # print(el)
+
+        if count > max_applicant_to_display : 
+            break
+        applicant_data = {}
+        applicant_data.update( { "first_name" : decrypt(password, el[1]) })
+        applicant_data.update( { "last_name" : decrypt(password, el[2]) })
+        applicant_data.update( { "date_of_birth" : decrypt(password, el[3]) })
+        applicant_data.update( { "address" : decrypt(password, el[4]) })
+        applicant_data.update( { "phone_number" : decrypt(password, el[5]) })
+
+        # update the applicants_data
+        print(applicant_data)
+        applicants_data.update({ el[0] : applicant_data})
+        count += 1
+
+    # generate widgets
     applicant_widgets = ft.Container(
         content= ft.GridView(
                 max_extent=333 + 10,  # each cell's max width
-                child_aspect_ratio=1.7,  # width/height ratio
+                child_aspect_ratio=1.5,  # width/height ratio
                 spacing=15,
                 run_spacing=10,
                 expand=True,
@@ -197,8 +223,8 @@ def applicants(page : ft.Page) :
 
 
     # Close the cursor and connection
-    # cursor.close()
-    # conn.close()
+    cursor.close()
+    conn.close()
 
     # left section construct (dark green)
     left_section = ft.Container(
